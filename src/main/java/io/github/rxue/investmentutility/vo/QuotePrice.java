@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public record QuotePrice(BigDecimal value, String currency) implements Comparable<QuotePrice> {
+    public long valueInCent() {
+        return value.movePointRight(2).setScale(0, RoundingMode.HALF_UP).longValueExact();
+    }
 
     @Override
     public String toString() {
