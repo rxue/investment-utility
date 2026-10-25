@@ -9,11 +9,6 @@ public class TradeMatchResult {
     public TradeMatchResult(Map<String,LotsMatchResult> lotsMatchResultMap) {
         this.lotsMatchResultMap = Collections.unmodifiableMap(lotsMatchResultMap);
     }
-    public long totalOpenLotsCostInCent() {
-        return lotsMatchResultMap.values().stream()
-                .mapToLong(LotsMatchResult::openLotsCostInCent)
-                .sum();
-    }
     public Map<String,Integer> openShareAmountBySecurity() {
         Map<String,Integer> result = new HashMap<>();
         lotsMatchResultMap.forEach((securityId, lotsMatchResult) -> {

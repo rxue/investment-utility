@@ -23,6 +23,5 @@ public class TradeMatcherTest {
         TradeMatchResult result = tradeMatcher.matchInFIFO(List.of(mrnaSell), openLotsMap);
 
         assertEquals(Map.of("SAGCV", 50), result.openShareAmountBySecurity());
-        assertEquals(38900, result.totalOpenLotsCostInCent());
     }
 }
