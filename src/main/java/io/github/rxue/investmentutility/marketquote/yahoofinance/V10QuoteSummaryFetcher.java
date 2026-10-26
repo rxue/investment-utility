@@ -1,5 +1,6 @@
 package io.github.rxue.investmentutility.marketquote.yahoofinance;
 
+import io.github.rxue.investmentutility.marketquote.QuoteFetchException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -57,9 +58,9 @@ class V10QuoteSummaryFetcher {
         }
         JsonNode quoteSummary = objectMapper.readTree(response.body()).path("quoteSummary");
         JsonNode error = quoteSummary.path("error");
-        if (response.statusCode() != 200 || !error.isMissingNode() && !error.isNull()) {
-            throw new IllegalStateException("Yahoo Finance request for " + uri
-                    + " failed with status " + response.statusCode() + ": " + error.path("description").asString(response.body()));
+        final int responseStatusCode = response.statusCode();
+        if (responseStatusCode != 200) {
+            throw new QuoteFetchException("Request got error response: " + error.path("description").asString(response.body()), responseStatusCode);
         }
         return getValues(quoteSummary, metrics);
     }

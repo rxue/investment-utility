@@ -1,5 +1,6 @@
 package io.github.rxue.investmentutility.marketquote.yahoofinance;
 
+import io.github.rxue.investmentutility.marketquote.QuoteFetchException;
 import org.junit.jupiter.api.Test;
 
 import java.net.CookieManager;
@@ -39,7 +40,7 @@ class V10QuoteSummaryFetcherIT {
     }
 
     @Test
-    void fetch_expiredCrumb() throws ReflectiveOperationException {
+    void fetch_expiredCrumb() {
         V10QuoteSummaryFetcher v10QuoteSummaryFetcher = new V10QuoteSummaryFetcher(httpClient, "expired crumb");
         // the first fetch gets a valid session cookie and crumb
         v10QuoteSummaryFetcher.fetch("AAPL", Set.of(CURRENCY));
@@ -48,5 +49,11 @@ class V10QuoteSummaryFetcherIT {
         Map<YahooMetric,Object> values = v10QuoteSummaryFetcher.fetch("AAPL", Set.of(CURRENCY));
 
         assertEquals("USD", values.get(CURRENCY));
+    }
+    @Test
+    void fetch_nonexistent_stock() {
+        V10QuoteSummaryFetcher v10QuoteSummaryFetcher = new V10QuoteSummaryFetcher(httpClient);
+        // the first fetch gets a valid session cookie and crumb
+        assertThrows(QuoteFetchException.class, () -> v10QuoteSummaryFetcher.fetch("PFEXXNOTEXIST", Set.of(CURRENCY)));
     }
 }
