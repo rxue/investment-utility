@@ -3,13 +3,19 @@ package io.github.rxue.investmentutility.marketquote;
 import java.util.OptionalInt;
 
 public class QuoteFetchException extends RuntimeException {
-    private final int responseStatusCode;
-    public QuoteFetchException(String message, int responseStatusCode) {
-        super(message);
-        this.responseStatusCode = responseStatusCode;
+    private final Integer statusCode;
+
+    public QuoteFetchException(String message, Throwable cause) {
+        super(message, cause);
+        this.statusCode = null;
     }
+
+    public QuoteFetchException(String message, int statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+    }
+
     public OptionalInt statusCode() {
-        if (responseStatusCode == 0) return OptionalInt.empty();
-        return OptionalInt.of(responseStatusCode);
+        return statusCode == null ? OptionalInt.empty() : OptionalInt.of(statusCode);
     }
 }
