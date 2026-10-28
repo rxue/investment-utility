@@ -12,6 +12,11 @@ public class MetricValues {
     public String securityId() {
         return securityId;
     }
+
+    SequencedMap<Metric, Comparable<?>> values() {
+        return values;
+    }
+
     public List<Metric> metricList() {
         return values.keySet().stream()
                 .toList();
