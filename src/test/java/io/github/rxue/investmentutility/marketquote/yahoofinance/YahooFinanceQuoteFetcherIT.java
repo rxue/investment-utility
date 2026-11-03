@@ -11,8 +11,10 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.SequencedSet;
 
 import io.github.rxue.investmentutility.vo.NumberWithFormat;
 
@@ -30,7 +32,7 @@ public class YahooFinanceQuoteFetcherIT {
 
     @Test
     void findMetricValues_latestMarketPriceAndDividendYield() {
-        Set<QuoteMetric> quoteMetrics = Set.of(LATEST_MARKET_PRICE, DIVIDEND_YIELD);
+        SequencedSet<QuoteMetric> quoteMetrics = new LinkedHashSet<>(List.of(LATEST_MARKET_PRICE, DIVIDEND_YIELD));
 
         Map<QuoteMetric, Comparable<?>> values = searchService.fetch("AAPL", quoteMetrics);
 

@@ -13,13 +13,13 @@ import static java.util.stream.Collectors.toMap;
  */
 public interface QuoteFetcher extends BatchQuoteFetcher, SingleQuoteFetcher {
     @Override
-    default MetricValuesList fetchAll(Set<String> securityIds, Set<QuoteMetric> quoteMetrics) {
+    default MetricValuesList fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
         Map<String,MetricValues> result = securityIds.stream()
                 .map(secId ->new AbstractMap.SimpleImmutableEntry<>(secId, toMetricValues(secId, fetch(secId, quoteMetrics))))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
         return new MetricValuesList(result);
     }
-    static MetricValues toMetricValues(String securityId, Map<QuoteMetric,Comparable<?>> quoteMetricValues) {
+    static MetricValues toMetricValues(String securityId, SequencedMap<QuoteMetric,Comparable<?>> quoteMetricValues) {
         return new MetricValues.Builder(securityId)
                 .addAll(quoteMetricValues)
                 .build();

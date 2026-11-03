@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -37,7 +38,7 @@ public class QuotesCommand implements Callable<Integer> {
 
     @Parameters(index = "0", arity = "1", paramLabel = "METRICS", split = ",",
             description = "Comma separated metric names. Valid values: ${COMPLETION-CANDIDATES}")
-    private Set<QuoteMetric> metrics;
+    private SequencedSet<QuoteMetric> metrics;
 
     @Parameters(index = "1", paramLabel = "TICKER_SYMBOLS_OR_CSV", description = "Ticker symbols delimited by comma, e.g. AAPL,PFE, or the csv storing ticker symbols")
     private String tickerSymbolsOrCsv;

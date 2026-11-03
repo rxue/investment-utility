@@ -7,13 +7,13 @@ public final class MetricValues {
     private final SequencedMap<Metric,Comparable<?>> values;
     private MetricValues(Builder builder) {
         this.securityId = builder.securityId;
-        this.values = Collections.unmodifiableSequencedMap(builder.values);
+        this.values = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(builder.values));
     }
     public String getSecurityId() {
         return securityId;
     }
 
-    public SequencedMap<Metric, Comparable<?>> getValues() {
+    public SequencedMap<Metric,Comparable<?>> getValues() {
         return values;
     }
 
@@ -36,7 +36,7 @@ public final class MetricValues {
             values.put(metric, value);
             return this;
         }
-        public Builder addAll(Map<? extends Metric,? extends Comparable<?>> values) {
+        public Builder addAll(SequencedMap<? extends Metric,? extends Comparable<?>> values) {
             this.values.putAll(values);
             return this;
         }

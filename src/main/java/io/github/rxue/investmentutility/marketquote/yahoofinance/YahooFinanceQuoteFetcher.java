@@ -41,13 +41,13 @@ public class YahooFinanceQuoteFetcher implements QuoteFetcher {
     }
 
     @Override
-    public Map<QuoteMetric,Comparable<?>> fetch(String securityId, Set<QuoteMetric> quoteMetrics) {
+    public SequencedMap<QuoteMetric,Comparable<?>> fetch(String securityId, SequencedSet<QuoteMetric> quoteMetrics) {
         Map<YahooMetric,Object> yahooMetricValues = v10QuoteSummaryFetcher.fetch(securityId, allNeededYahooMetrics(quoteMetrics));
-        Map<QuoteMetric,Comparable<?>> resultValues = new HashMap<>();
+        SequencedMap<QuoteMetric,Comparable<?>> resultValues = new LinkedHashMap<>();
         for (QuoteMetric quoteMetric : quoteMetrics) {
             resultValues.put(quoteMetric, getQuoteMetricValue(quoteMetric, yahooMetricValues));
         }
-        return Collections.unmodifiableMap(resultValues);
+        return Collections.unmodifiableSequencedMap(resultValues);
     }
 
     private Comparable<?> getQuoteMetricValue(QuoteMetric quoteMetric, Map<YahooMetric,Object> yahooMetricValues) {

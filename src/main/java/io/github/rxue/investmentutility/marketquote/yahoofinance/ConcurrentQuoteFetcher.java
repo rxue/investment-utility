@@ -30,8 +30,8 @@ public class ConcurrentQuoteFetcher implements BatchQuoteFetcher {
     }
 
     @Override
-    public MetricValuesList fetchAll(Set<String> securityIds, Set<QuoteMetric> quoteMetrics) {
-        List<Callable<Map<QuoteMetric,Comparable<?>>>> tasks = new ArrayList<>();
+    public MetricValuesList fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
+        List<Callable<SequencedMap<QuoteMetric,Comparable<?>>>> tasks = new ArrayList<>();
         List<String> securityIdList = new ArrayList<>();
         for (String securityId : securityIds) {
             tasks.add(() -> quoteFetcher.fetch(securityId, quoteMetrics));
@@ -39,7 +39,7 @@ public class ConcurrentQuoteFetcher implements BatchQuoteFetcher {
         }
         try {
             // blocks until every task has completed (normally or exceptionally)
-            List<Future<Map<QuoteMetric,Comparable<?>>>> futures = executorService.invokeAll(tasks);
+            List<Future<SequencedMap<QuoteMetric,Comparable<?>>>> futures = executorService.invokeAll(tasks);
             Map<String,MetricValues> metricValuesBySecurityId = new HashMap<>();
             for (int i = 0; i < securityIdList.size(); i++) {
                 String secId = securityIdList.get(i);

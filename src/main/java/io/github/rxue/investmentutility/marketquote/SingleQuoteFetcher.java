@@ -1,7 +1,7 @@
 package io.github.rxue.investmentutility.marketquote;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.SequencedMap;
+import java.util.SequencedSet;
 
 public interface SingleQuoteFetcher {
     /**
@@ -11,5 +11,5 @@ public interface SingleQuoteFetcher {
      * @return
      * @throws QuoteFetchException if the quote cannot be fetched, e.g. network failure or an error response
      */
-    Map<QuoteMetric,Comparable<?>> fetch(String securityId, Set<QuoteMetric> quoteMetrics);
+    SequencedMap<QuoteMetric,Comparable<?>> fetch(String securityId, SequencedSet<QuoteMetric> quoteMetrics);
 }
