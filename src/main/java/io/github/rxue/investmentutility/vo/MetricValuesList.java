@@ -22,10 +22,4 @@ public record MetricValuesList(Map<String,MetricValues> valuesBySecurityId) {
                 .get(metric);
         return valueType.cast(comparableValue);
     }
-    public Map<String,Map<Metric,Comparable<?>>> fullMap() {
-        Map<String,Map<Metric,Comparable<?>>> result = new HashMap<>();
-        valuesBySecurityId.forEach((securityId,metricValues) ->
-                result.put(securityId, metricValues.values()));
-        return Collections.unmodifiableMap(result);
-    }
 }

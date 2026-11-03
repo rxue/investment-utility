@@ -2,18 +2,18 @@ package io.github.rxue.investmentutility.vo;
 
 import java.util.*;
 
-public class MetricValues {
+public final class MetricValues {
     private final String securityId;
     private final SequencedMap<Metric,Comparable<?>> values;
     private MetricValues(Builder builder) {
         this.securityId = builder.securityId;
         this.values = Collections.unmodifiableSequencedMap(builder.values);
     }
-    public String securityId() {
+    public String getSecurityId() {
         return securityId;
     }
 
-    SequencedMap<Metric, Comparable<?>> values() {
+    public SequencedMap<Metric, Comparable<?>> getValues() {
         return values;
     }
 
@@ -32,7 +32,7 @@ public class MetricValues {
             this.securityId = securityId;
             this.values = new LinkedHashMap<>();
         }
-        public Builder add(Metric metric, Comparable<?> value) {
+        public Builder add(Metric metric,Comparable<?> value) {
             values.put(metric, value);
             return this;
         }
