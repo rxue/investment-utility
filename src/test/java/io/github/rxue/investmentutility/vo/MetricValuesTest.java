@@ -17,6 +17,6 @@ public class MetricValuesTest {
 
         builder.add(QuoteMetric.TRAILING_PE, "30");
 
-        assertEquals(Map.of(QuoteMetric.COMPANY_NAME, "Apple Inc."), metricValues.getValues());
+        assertEquals(Map.of(QuoteMetric.COMPANY_NAME, "Apple Inc."), metricValues.getValueByMetric());
     }
 }

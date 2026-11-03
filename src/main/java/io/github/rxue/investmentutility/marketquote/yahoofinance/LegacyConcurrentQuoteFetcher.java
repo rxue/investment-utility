@@ -4,7 +4,6 @@ import io.github.rxue.investmentutility.marketquote.BatchQuoteFetcher;
 import io.github.rxue.investmentutility.marketquote.QuoteMetric;
 import io.github.rxue.investmentutility.marketquote.QuoteFetcher;
 import io.github.rxue.investmentutility.vo.MetricValues;
-import io.github.rxue.investmentutility.vo.MetricValuesList;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -27,7 +26,7 @@ public class LegacyConcurrentQuoteFetcher implements BatchQuoteFetcher {
     }
 
     @Override
-    public MetricValuesList fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
+    public List<MetricValues> fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
         List<Callable<SequencedMap<QuoteMetric,Comparable<?>>>> tasks = new ArrayList<>();
         List<String> securityIdList = new ArrayList<>();
         for (String securityId : securityIds) {
@@ -37,12 +36,12 @@ public class LegacyConcurrentQuoteFetcher implements BatchQuoteFetcher {
         try {
             // blocks until every task has completed (normally or exceptionally)
             List<Future<SequencedMap<QuoteMetric,Comparable<?>>>> futures = executorService.invokeAll(tasks);
-            Map<String,MetricValues> metricValuesBySecurityId = new HashMap<>();
+            List<MetricValues> metricValuesList = new ArrayList<>();
             for (int i = 0; i < securityIdList.size(); i++) {
                 String secId = securityIdList.get(i);
-                metricValuesBySecurityId.put(secId, QuoteFetcher.toMetricValues(secId, futures.get(i).get()));
+                metricValuesList.add(QuoteFetcher.toMetricValues(secId, futures.get(i).get()));
             }
-            return new MetricValuesList(metricValuesBySecurityId);
+            return metricValuesList;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);

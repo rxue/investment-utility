@@ -13,7 +13,7 @@ public final class MetricValues {
         return securityId;
     }
 
-    public SequencedMap<Metric,Comparable<?>> getValues() {
+    public SequencedMap<Metric,Comparable<?>> getValueByMetric() {
         return values;
     }
 
@@ -21,10 +21,15 @@ public final class MetricValues {
         return values.keySet().stream()
                 .toList();
     }
-
-    public Comparable<?> get(Metric metric) {
-        return values.get(metric);
+    public List<Comparable<?>> values() {
+        return values.values().stream().toList();
     }
+
+    public static Comparator<MetricValues> comparatorBy(Metric metric) {
+        return Comparator.comparing(mv -> (Comparable<Object>) mv.values.get(metric),
+                Comparator.nullsLast(Comparator.naturalOrder()));
+    }
+
     public static class Builder {
         private final String securityId;
         private final SequencedMap<Metric,Comparable<?>> values;

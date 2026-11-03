@@ -5,7 +5,6 @@ import io.github.rxue.investmentutility.marketquote.QuoteMetric;
 import io.github.rxue.investmentutility.marketquote.yahoofinance.ConcurrentQuoteFetcher;
 import io.github.rxue.investmentutility.marketquote.yahoofinance.YahooFinanceQuoteFetcher;
 import io.github.rxue.investmentutility.vo.MetricValues;
-import io.github.rxue.investmentutility.vo.MetricValuesList;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import picocli.CommandLine.Command;
@@ -19,15 +18,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.SequencedSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static io.github.rxue.investmentutility.vo.MetricValues.comparatorBy;
 import static java.util.stream.Collectors.toSet;
 
 @Command(name = "quotes", description = "Prints quote metrics of a security", mixinStandardHelpOptions = true)
@@ -59,16 +56,18 @@ public class QuotesCommand implements Callable<Integer> {
         Set<String> tickerSymbolSet = tickerSymbols();
         long findStartNanos = System.nanoTime();
         BatchQuoteFetcher searchService = getSearchService(concurrent);
-        MetricValuesList valuesList = searchService.fetchAll(tickerSymbolSet, metrics);
+        List<MetricValues> valuesList = searchService.fetchAll(tickerSymbolSet, metrics);
         double findSeconds = (System.nanoTime() - findStartNanos) / 1_000_000_000.0;
-        List<MetricValues> sortedValuesList = sortBy == null ? valuesList.valuesList() : valuesList.sortedBy(sortBy);
+        @SuppressWarnings("unchecked")
+        List<MetricValues> sortedValuesList = sortBy == null ? valuesList
+                : valuesList.stream().sorted(comparatorBy(sortBy)).toList();
         List<String> labels = metrics.stream().map(QuoteMetric::label).toList();
-        List<List<String>> rows = sortedValuesList.stream()
-                .map(metricValues -> metrics.stream().map(metric -> "" + metricValues.get(metric)).toList())
+        List<List<Comparable<?>>> rows = sortedValuesList.stream()
+                .map(MetricValues::values)
                 .toList();
         String rowFormat = IntStream.range(0, labels.size())
                 .mapToObj(i -> "%-" + Math.max(labels.get(i).length(),
-                        rows.stream().mapToInt(row -> row.get(i).length()).max().orElse(0)) + "s")
+                        rows.stream().mapToInt(row -> row.get(i).toString().length()).max().orElse(0)) + "s")
                 .collect(Collectors.joining("  ")) + "%n";
         PrintWriter out = spec.commandLine().getOut();
         out.printf(rowFormat, labels.toArray());

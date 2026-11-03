@@ -2,7 +2,6 @@
 package io.github.rxue.investmentutility.marketquote;
 
 import io.github.rxue.investmentutility.vo.MetricValues;
-import io.github.rxue.investmentutility.vo.MetricValuesList;
 
 import java.util.*;
 
@@ -12,13 +11,14 @@ import static java.util.stream.Collectors.toMap;
  * Contract: report currency has to be configured so that the LATEST_MARKET_PRICE_IN_REPORT_CURRENCY can be calculated
  */
 public interface QuoteFetcher extends BatchQuoteFetcher, SingleQuoteFetcher {
+
     @Override
-    default MetricValuesList fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
-        Map<String,MetricValues> result = securityIds.stream()
-                .map(secId ->new AbstractMap.SimpleImmutableEntry<>(secId, toMetricValues(secId, fetch(secId, quoteMetrics))))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return new MetricValuesList(result);
+    default List<MetricValues> fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
+        return securityIds.stream()
+                .map(secId -> toMetricValues(secId, fetch(secId, quoteMetrics)))
+                .toList();
     }
+
     static MetricValues toMetricValues(String securityId, SequencedMap<QuoteMetric,Comparable<?>> quoteMetricValues) {
         return new MetricValues.Builder(securityId)
                 .addAll(quoteMetricValues)
