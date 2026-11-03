@@ -24,6 +24,9 @@ public final class MetricValues {
     public List<Comparable<?>> values() {
         return values.values().stream().toList();
     }
+    public Comparable<?> valueOf(Metric metric) {
+        return values.get(metric);
+    }
 
     public static Comparator<MetricValues> comparatorBy(Metric metric) {
         return Comparator.comparing(mv -> (Comparable<Object>) mv.values.get(metric),
