@@ -53,11 +53,11 @@ public class YahooFinanceQuoteFetcher implements QuoteFetcher {
     private Comparable<?> getQuoteMetricValue(QuoteMetric quoteMetric, Map<YahooMetric,Object> yahooMetricValues) {
         return switch(quoteMetric) {
             case COMPANY_NAME -> (String) yahooMetricValues.get(YahooMetric.LONG_NAME);
-            case LATEST_MARKET_PRICE -> {
+            case REGULAR_MARKET_PRICE -> {
                 BigDecimal priceValue = ((NumberWithFormat) yahooMetricValues.get(YahooMetric.REGULAR_MARKET_PRICE)).value();
                 yield new QuotePrice(priceValue, (String) yahooMetricValues.get(YahooMetric.CURRENCY));
             }
-            case LATEST_MARKET_PRICE_IN_REPORT_CURRENCY -> {
+            case REGULAR_MARKET_PRICE_IN_REPORT_CURRENCY -> {
                 BigDecimal priceValue = ((NumberWithFormat) yahooMetricValues.get(YahooMetric.REGULAR_MARKET_PRICE)).value();
                 String originalCurrency = (String) yahooMetricValues.get(YahooMetric.CURRENCY);
                 Pair<LocalDate,BigDecimal> fxRateOnDate = fxRateFetcher.fetchRate(reportCurrency, originalCurrency, LocalDate.now());
@@ -75,7 +75,7 @@ public class YahooFinanceQuoteFetcher implements QuoteFetcher {
         for (QuoteMetric quoteMetric : quoteMetrics) {
             switch(quoteMetric) {
                 case COMPANY_NAME -> result.add(YahooMetric.LONG_NAME);
-                case LATEST_MARKET_PRICE,LATEST_MARKET_PRICE_IN_REPORT_CURRENCY -> {
+                case REGULAR_MARKET_PRICE, REGULAR_MARKET_PRICE_IN_REPORT_CURRENCY -> {
                     result.add(YahooMetric.REGULAR_MARKET_PRICE);
                     result.add(YahooMetric.CURRENCY);
                 }

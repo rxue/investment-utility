@@ -19,7 +19,7 @@ import java.util.SequencedSet;
 import io.github.rxue.investmentutility.vo.NumberWithFormat;
 
 import static io.github.rxue.investmentutility.marketquote.QuoteMetric.DIVIDEND_YIELD;
-import static io.github.rxue.investmentutility.marketquote.QuoteMetric.LATEST_MARKET_PRICE;
+import static io.github.rxue.investmentutility.marketquote.QuoteMetric.REGULAR_MARKET_PRICE;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class YahooFinanceQuoteFetcherIT {
@@ -32,12 +32,12 @@ public class YahooFinanceQuoteFetcherIT {
 
     @Test
     void findMetricValues_latestMarketPriceAndDividendYield() {
-        SequencedSet<QuoteMetric> quoteMetrics = new LinkedHashSet<>(List.of(LATEST_MARKET_PRICE, DIVIDEND_YIELD));
+        SequencedSet<QuoteMetric> quoteMetrics = new LinkedHashSet<>(List.of(REGULAR_MARKET_PRICE, DIVIDEND_YIELD));
 
         Map<QuoteMetric, Comparable<?>> values = searchService.fetch("AAPL", quoteMetrics);
 
         assertEquals(quoteMetrics, values.keySet());
-        QuotePrice latestMarketQuotePrice = (QuotePrice) values.get(LATEST_MARKET_PRICE);
+        QuotePrice latestMarketQuotePrice = (QuotePrice) values.get(REGULAR_MARKET_PRICE);
         assertTrue(latestMarketQuotePrice.value().signum() > 0, "latest market price should be positive but was " + latestMarketQuotePrice.value());
         assertEquals("USD", latestMarketQuotePrice.currency());
         // the dividend yield is a fraction, e.g. 0.004 for 0.4%
