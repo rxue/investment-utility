@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static io.github.rxue.investmentutility.vo.MetricValues.comparatorBy;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toCollection;
 
 @Command(name = "quotes", description = "Prints quote metrics of a security", mixinStandardHelpOptions = true)
 public class QuotesCommand implements Callable<Integer> {
@@ -53,7 +53,7 @@ public class QuotesCommand implements Callable<Integer> {
         if (sortBy != null && !metrics.contains(sortBy)) {
             throw new ParameterException(spec.commandLine(), "--sort-by metric " + sortBy + " must be one of METRICS");
         }
-        Set<String> tickerSymbolSet = tickerSymbols();
+        SequencedSet<String> tickerSymbolSet = tickerSymbols();
         long findStartNanos = System.nanoTime();
         BatchQuoteFetcher searchService = getSearchService(concurrent);
         List<MetricValues> valuesList = searchService.fetchAll(tickerSymbolSet, metrics);
@@ -87,10 +87,10 @@ public class QuotesCommand implements Callable<Integer> {
      * @return ticker symbols given directly, or the non-blank values of the first column of the csv file, excluding the header row,
      * in case a csv file path is given
      */
-    private Set<String> tickerSymbols() {
+    private SequencedSet<String> tickerSymbols() {
         if (!tickerSymbolsOrCsv.toLowerCase().endsWith(".csv")) {
             return Arrays.stream(tickerSymbolsOrCsv.split(","))
-                    .collect(toSet());
+                    .collect(toCollection(LinkedHashSet::new));
         }
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
                 .setHeader()
@@ -101,7 +101,7 @@ public class QuotesCommand implements Callable<Integer> {
                     .map(csvRecord -> csvRecord.get(0))
                     .map(String::trim)
                     .filter(tickerSymbol -> !tickerSymbol.isEmpty())
-                    .collect(toSet());
+                    .collect(toCollection(LinkedHashSet::new));
         } catch (IOException e) {
             throw new ParameterException(spec.commandLine(), "Failed to read csv file " + tickerSymbolsOrCsv + ": " + e, e);
         }

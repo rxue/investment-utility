@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toMap;
 public interface QuoteFetcher extends BatchQuoteFetcher, SingleQuoteFetcher {
 
     @Override
-    default List<MetricValues> fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
+    default List<MetricValues> fetchAll(SequencedSet<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
         return securityIds.stream()
                 .map(secId -> toMetricValues(secId, fetch(secId, quoteMetrics)))
                 .toList();

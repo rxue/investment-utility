@@ -4,9 +4,14 @@ import io.github.rxue.investmentutility.vo.MetricValues;
 
 import java.util.List;
 import java.util.SequencedSet;
-import java.util.Set;
 
 public interface BatchQuoteFetcher {
-    List<MetricValues> fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics);
+    /**
+     *
+     * @param securityIds
+     * @param quoteMetrics
+     * @return one {@link MetricValues} per security id in {@code securityIds}, in the same iteration order as {@code securityIds}
+     */
+    List<MetricValues> fetchAll(SequencedSet<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics);
 
 }

@@ -29,7 +29,7 @@ public final class MetricValues {
     }
 
     public static Comparator<MetricValues> comparatorBy(Metric metric) {
-        return Comparator.comparing(mv -> (Comparable<Object>) mv.values.get(metric),
+        return Comparator.comparing(mv -> (Comparable<Object>) mv.valueOf(metric),
                 Comparator.nullsLast(Comparator.naturalOrder()));
     }
 

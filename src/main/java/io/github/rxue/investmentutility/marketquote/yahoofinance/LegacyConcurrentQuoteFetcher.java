@@ -26,7 +26,7 @@ public class LegacyConcurrentQuoteFetcher implements BatchQuoteFetcher {
     }
 
     @Override
-    public List<MetricValues> fetchAll(Set<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
+    public List<MetricValues> fetchAll(SequencedSet<String> securityIds, SequencedSet<QuoteMetric> quoteMetrics) {
         List<Callable<SequencedMap<QuoteMetric,Comparable<?>>>> tasks = new ArrayList<>();
         List<String> securityIdList = new ArrayList<>();
         for (String securityId : securityIds) {
