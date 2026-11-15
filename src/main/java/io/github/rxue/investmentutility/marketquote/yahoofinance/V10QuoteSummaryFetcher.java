@@ -4,15 +4,11 @@ import io.github.rxue.investmentutility.marketquote.QuoteFetchException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.*;
 
 import io.github.rxue.investmentutility.vo.NumberWithFormat;
@@ -24,9 +20,6 @@ class V10QuoteSummaryFetcher {
     private static final String COOKIE_URL = "https://fc.yahoo.com";
     private static final String CRUMB_URL = "https://query2.finance.yahoo.com/v1/test/getcrumb";
     private static final String QUOTE_SUMMARY_URL = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/";
-    // Yahoo answers 429 to the default Java user agent, and to Linux browser user agents as well
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
     private final RequestSender requestSender;
     private final ObjectMapper objectMapper = new ObjectMapper();

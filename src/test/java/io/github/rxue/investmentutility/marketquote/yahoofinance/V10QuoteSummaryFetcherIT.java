@@ -25,7 +25,7 @@ class V10QuoteSummaryFetcherIT {
     private final V10QuoteSummaryFetcher v10QuoteSummaryFetcher = new V10QuoteSummaryFetcher(httpClient);
 
     @Test
-    void fetch_metricsOfMultipleModules() {
+    void fetch_metricsOfMultipleModules() throws InterruptedException {
         // REGULAR_MARKET_PRICE and CURRENCY are in module price, TRAILING_PE is in module summaryDetail
         Set<YahooMetric> metrics = Set.of(REGULAR_MARKET_PRICE, CURRENCY, TRAILING_PE);
 
@@ -40,7 +40,7 @@ class V10QuoteSummaryFetcherIT {
     }
 
     @Test
-    void fetch_expiredCrumb() {
+    void fetch_expiredCrumb() throws InterruptedException {
         V10QuoteSummaryFetcher v10QuoteSummaryFetcher = new V10QuoteSummaryFetcher(httpClient, "expired crumb");
         // the first fetch gets a valid session cookie and crumb
         v10QuoteSummaryFetcher.fetch("AAPL", Set.of(CURRENCY));
