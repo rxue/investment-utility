@@ -42,7 +42,13 @@ public class YahooFinanceQuoteFetcher implements QuoteFetcher {
 
     @Override
     public SequencedMap<QuoteMetric,Comparable<?>> fetch(String securityId, SequencedSet<QuoteMetric> quoteMetrics) {
-        Map<YahooMetric,Object> yahooMetricValues = v10QuoteSummaryFetcher.fetch(securityId, allNeededYahooMetrics(quoteMetrics));
+        Map<YahooMetric,Object> yahooMetricValues = null;
+        try {
+            yahooMetricValues = v10QuoteSummaryFetcher.fetch(securityId, allNeededYahooMetrics(quoteMetrics));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return new LinkedHashMap<>(Map.of());
+        }
         SequencedMap<QuoteMetric,Comparable<?>> resultValues = new LinkedHashMap<>();
         for (QuoteMetric quoteMetric : quoteMetrics) {
             resultValues.put(quoteMetric, getQuoteMetricValue(quoteMetric, yahooMetricValues));

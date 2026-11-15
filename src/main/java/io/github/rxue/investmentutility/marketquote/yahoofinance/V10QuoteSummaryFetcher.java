@@ -28,17 +28,16 @@ class V10QuoteSummaryFetcher {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
-    private final HttpClient httpClient;
+    private final RequestSender requestSender;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Object crumbLock;
     private volatile String crumb;
-
     public V10QuoteSummaryFetcher(HttpClient httpClient) {
         this(httpClient, null);
     }
 
     V10QuoteSummaryFetcher(HttpClient httpClient, String crumb) {
-        this.httpClient = httpClient;
+        this.requestSender = new RequestSender(httpClient);
         this.crumb = crumb;
         this.crumbLock = new Object();
     }
@@ -46,15 +45,15 @@ class V10QuoteSummaryFetcher {
     /**
      * @return an instance of the type class of the given metric
      */
-    Map<YahooMetric,Object> fetch(String securityId, Set<YahooMetric> metrics) {
+    Map<YahooMetric,Object> fetch(String securityId, Set<YahooMetric> metrics) throws InterruptedException {
         String usedCrumb = crumb();
         URI uri = quoteSummaryUri(commaDelimitedModules(metrics), securityId, usedCrumb);
-        HttpResponse<String> response = sendRequest(uri);
+        HttpResponse<String> response = requestSender.send(uri);
         if (response.statusCode() == 401) {
             // the crumb has expired
             invalidateCrumb(usedCrumb);
             uri = quoteSummaryUri(commaDelimitedModules(metrics), securityId, crumb());
-            response = sendRequest(uri);
+            response = requestSender.send(uri);
         }
         JsonNode quoteSummary = objectMapper.readTree(response.body()).path("quoteSummary");
         JsonNode error = quoteSummary.path("error");
@@ -96,36 +95,20 @@ class V10QuoteSummaryFetcher {
         }
     }
 
-    private String crumb() {
+    private String crumb() throws InterruptedException {
         String current = crumb;
         if (current != null) return current;
         synchronized (crumbLock) {
             if (crumb == null) {
                 // the response itself is irrelevant, the request is only made to get the session cookie
-                sendRequest(URI.create(COOKIE_URL));
-                HttpResponse<String> response = sendRequest(URI.create(CRUMB_URL));
+                requestSender.send(URI.create(COOKIE_URL));
+                HttpResponse<String> response = requestSender.send(URI.create(CRUMB_URL));
                 if (response.statusCode() != 200 || response.body().isBlank()) {
                     throw new IllegalStateException("Failed to get the Yahoo Finance crumb, status " + response.statusCode() + ": " + response.body());
                 }
                 crumb = response.body();
             }
             return crumb;
-        }
-    }
-
-    private HttpResponse<String> sendRequest(URI uri) {
-        HttpRequest request = HttpRequest.newBuilder(uri)
-                .header("User-Agent", USER_AGENT)
-                .timeout(TIMEOUT)
-                .GET()
-                .build();
-        try {
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while requesting " + uri, e);
         }
     }
 

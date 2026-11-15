@@ -16,7 +16,7 @@ Print the name, latest market price, trailing P/E and dividend yield of Apple an
 ```bash
 mvn -q compile exec:java \
   -Dexec.mainClass=io.github.rxue.investmentutility.cli.Main \
-  -Dexec.args="quotes COMPANY_NAME,LATEST_MARKET_PRICE,TRAILING_PE,DIVIDEND_YIELD AAPL,PFE --sort-by TRAILING_PE"
+  -Dexec.args="quotes COMPANY_NAME,REGULAR_MARKET_PRICE,TRAILING_PE,DIVIDEND_YIELD AAPL,PFE --sort-by TRAILING_PE"
 ```
 Output:
 ```
@@ -32,5 +32,5 @@ By default the ticker symbols are fetched one after another. With the `--concurr
 ```bash
 mvn -q compile exec:java \
   -Dexec.mainClass=io.github.rxue.investmentutility.cli.Main \
-  -Dexec.args="quotes COMPANY_NAME,LATEST_MARKET_PRICE tickers.csv --concurrent"
+  -Dexec.args="quotes COMPANY_NAME,REGULAR_MARKET_PRICE tickers.csv --concurrent"
 ```
