@@ -3,6 +3,7 @@ package io.github.rxue.investmentutility.marketquote.yahoofinance;
 import io.github.rxue.investmentutility.marketquote.QuoteFetchException;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.http.HttpClient;
@@ -25,7 +26,7 @@ class V10QuoteSummaryFetcherIT {
     private final V10QuoteSummaryFetcher v10QuoteSummaryFetcher = new V10QuoteSummaryFetcher(httpClient);
 
     @Test
-    void fetch_metricsOfMultipleModules() throws InterruptedException {
+    void fetch_metricsOfMultipleModules() throws InterruptedException, IOException {
         // REGULAR_MARKET_PRICE and CURRENCY are in module price, TRAILING_PE is in module summaryDetail
         Set<YahooMetric> metrics = Set.of(REGULAR_MARKET_PRICE, CURRENCY, TRAILING_PE);
 
@@ -40,7 +41,7 @@ class V10QuoteSummaryFetcherIT {
     }
 
     @Test
-    void fetch_expiredCrumb() throws InterruptedException {
+    void fetch_expiredCrumb() throws InterruptedException, IOException {
         V10QuoteSummaryFetcher v10QuoteSummaryFetcher = new V10QuoteSummaryFetcher(httpClient, "expired crumb");
         // the first fetch gets a valid session cookie and crumb
         v10QuoteSummaryFetcher.fetch("AAPL", Set.of(CURRENCY));

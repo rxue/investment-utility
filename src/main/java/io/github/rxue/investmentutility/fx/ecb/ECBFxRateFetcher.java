@@ -1,7 +1,7 @@
 package io.github.rxue.investmentutility.fx.ecb;
 
 import io.github.rxue.investmentutility.fx.FxRateFetcher;
-import io.github.rxue.investmentutility.v2.RequestSender;
+import io.github.rxue.investmentutility.v2.util.RequestSender;
 import io.github.rxue.investmentutility.vo.Pair;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -11,9 +11,7 @@ import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -35,6 +33,8 @@ public class ECBFxRateFetcher implements FxRateFetcher {
                 return fetchFxRateFromEuro(quoteCurrency, date);
             } catch (InterruptedException e) {
                 throw new IllegalStateException(e);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
         }
         throw new UnsupportedOperationException();
@@ -44,7 +44,7 @@ public class ECBFxRateFetcher implements FxRateFetcher {
      * @return the reference rate of the given date, or of the latest publishing day before it when no rate was
      * published on that date, paired with the date the rate is actually from
      */
-    private Pair<LocalDate,BigDecimal> fetchFxRateFromEuro(String currency, LocalDate date) throws InterruptedException {
+    private Pair<LocalDate,BigDecimal> fetchFxRateFromEuro(String currency, LocalDate date) throws InterruptedException, IOException {
         if ("EUR".equals(currency)) {
             return new Pair<>(date, BigDecimal.ONE);
         }

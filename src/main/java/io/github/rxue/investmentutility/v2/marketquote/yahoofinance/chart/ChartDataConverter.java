@@ -7,22 +7,24 @@ import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-class ChartDataConverter implements JsonNodeConverter<ChartData> {
+class ChartDataConverter implements JsonNodeConverter<Chart> {
     private final ObjectMapper objectMapper;
     public ChartDataConverter() {
         this.objectMapper = new ObjectMapper();
     }
 
     @Override
-    public ChartData toData(String jsonConent) {
-        JsonNode chart = objectMapper.readTree(jsonConent).path("chart");
+    public Chart toData(String jsonContent) {
+        JsonNode chart = objectMapper.readTree(jsonContent).path("chart");
         JsonNode error = chart.path("error");
         if (!error.isMissingNode() && !error.isNull()) {
-            throw new IllegalStateException();
+            String code = error.path("code").asString();
+            String description = error.path("description").asString();
+            return new Chart(null, new Chart.Error(code, description));
         }
-        return toChartData(chart.path("result").path(0));
+        return new Chart(toResult(chart.path("result").path(0)), null);
     }
-    private ChartData toChartData(JsonNode result) {
+    private Chart.Result toResult(JsonNode result) {
         JsonNode meta = result.path("meta");
         // epoch seconds of each trading session's open, at the same index as its close
         long[] timestamps = new long[result.path("timestamp").size()];
@@ -38,9 +40,8 @@ class ChartDataConverter implements JsonNodeConverter<ChartData> {
             // the close is null for a day without trades; it is kept as null so that it stays aligned with its timestamp
             closes[i] = close.isNumber() ? close.decimalValue().setScale(scale, RoundingMode.HALF_UP) : null;
         }
-        return new ChartData(
-                new Meta(meta.path("currency").asString(), meta.path("regularMarketTime").asLong()),
+        return new Chart.Result(new Chart.Meta(meta.path("currency").asString(), meta.path("regularMarketTime").asLong()),
                 timestamps,
-                new Indicators(new Quote(closes)));
+                new Chart.Indicators(new Chart.Quote(closes)));
     }
 }

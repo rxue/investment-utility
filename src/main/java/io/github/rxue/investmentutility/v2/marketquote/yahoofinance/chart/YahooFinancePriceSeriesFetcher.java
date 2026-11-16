@@ -6,11 +6,11 @@ import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePrice;
 import io.github.rxue.investmentutility.v2.marketquote.vo.price.Value;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,16 +22,19 @@ public class YahooFinancePriceSeriesFetcher implements PriceSeriesFetcher {
 
     @Override
     public Result<List<ClosePrice>> fetchDaily(String symbol, LocalDate fromInclusive, LocalDate toInclusive) {
+        final Instant start = fromInclusive.atStartOfDay(ZoneOffset.UTC).toInstant();
+        final Instant end = toInclusive.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         try {
-            Instant start = fromInclusive.atStartOfDay(ZoneOffset.UTC).toInstant();
-            Instant end = fromInclusive.atStartOfDay(ZoneOffset.UTC).toInstant();
-            ChartData chartData = chartFetcher.fetchDaily(symbol, start.getEpochSecond(), end.getEpochSecond());
-            return new Result<>(toClosePriceSeries(chartData), null);
+            Chart chartData = chartFetcher.fetchDaily(symbol, start.getEpochSecond(), end.getEpochSecond());
+            return new Result<>(toClosePriceSeries(chartData.result()), null);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return new Result<>(List.of(), FailureReason.CANCELED);
+        } catch (IOException e) {
+            return new Result<>(List.of(), FailureReason.NETWORK_ERROR);
         }
     }
-    private static List<ClosePrice> toClosePriceSeries(ChartData chartData) {
+    private static List<ClosePrice> toClosePriceSeries(Chart.Result chartData) {
         long[] timestamps = chartData.timestamp();
         BigDecimal[] closes = chartData.indicator().quote().close();
         if (timestamps.length != closes.length) {
@@ -47,10 +50,6 @@ public class YahooFinancePriceSeriesFetcher implements PriceSeriesFetcher {
             closePrices.add(new ClosePrice(date, new Value(closes[i], currency)));
         }
         return List.copyOf(closePrices);
-    }
-    private static long daysFromNow(LocalDate backToInclusiveDate) {
-        // Duration.between does not work on LocalDate, which has no time of day to count seconds from
-        return ChronoUnit.DAYS.between(backToInclusiveDate, LocalDate.now());
     }
 
 }

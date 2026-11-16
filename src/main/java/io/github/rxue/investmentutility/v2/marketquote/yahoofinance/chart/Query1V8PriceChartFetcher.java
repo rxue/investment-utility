@@ -1,6 +1,8 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
-import io.github.rxue.investmentutility.v2.RequestSender;
+import io.github.rxue.investmentutility.v2.util.RequestSender;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -22,19 +24,12 @@ class Query1V8PriceChartFetcher {
      * @param period2
      * @return the daily timestamps and close prices, oldest first; the close of a day without trades is null
      */
-    ChartData fetchDaily(String yahooTickerSymbol, long period1, long period2) throws InterruptedException {
-        URI uri = chartUri(yahooTickerSymbol, period1, period2);
+    Chart fetchDaily(String yahooTickerSymbol, long period1, long period2) throws InterruptedException, IOException {
+        URI uri = URI.create(URL_PREFIX + URLEncoder.encode(yahooTickerSymbol, StandardCharsets.UTF_8)
+                + "?period1=" + period1 + "&period2=" + period2 + "&interval=1d");
         HttpResponse<String> response = requestSender.send(uri);
-/*        int responseStatusCode = response.statusCode();
-        if (responseStatusCode != 200) {
-            throw new QuoteFetchException("Yahoo Finance request for " + uri + " failed: ", responseStatusCode);
-        }*/
         return chartDataConverter.toData(response.body());
     }
 
 
-    private static URI chartUri(String yahooTickerSymbol, long period1, long period2) {
-        return URI.create(URL_PREFIX + URLEncoder.encode(yahooTickerSymbol, StandardCharsets.UTF_8)
-                + "?period1=" + period1 + "&period2=" + period2 + "&interval=1d");
-    }
 }

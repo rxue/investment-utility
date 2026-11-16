@@ -1,10 +1,11 @@
 package io.github.rxue.investmentutility.marketquote.yahoofinance;
 
 import io.github.rxue.investmentutility.marketquote.QuoteFetchException;
-import io.github.rxue.investmentutility.v2.RequestSender;
+import io.github.rxue.investmentutility.v2.util.RequestSender;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -39,7 +40,7 @@ class V10QuoteSummaryFetcher {
     /**
      * @return an instance of the type class of the given metric
      */
-    Map<YahooMetric,Object> fetch(String securityId, Set<YahooMetric> metrics) throws InterruptedException {
+    Map<YahooMetric,Object> fetch(String securityId, Set<YahooMetric> metrics) throws InterruptedException, IOException {
         String usedCrumb = crumb();
         URI uri = quoteSummaryUri(commaDelimitedModules(metrics), securityId, usedCrumb);
         HttpResponse<String> response = requestSender.send(uri);
@@ -89,7 +90,7 @@ class V10QuoteSummaryFetcher {
         }
     }
 
-    private String crumb() throws InterruptedException {
+    private String crumb() throws InterruptedException, IOException {
         String current = crumb;
         if (current != null) return current;
         synchronized (crumbLock) {

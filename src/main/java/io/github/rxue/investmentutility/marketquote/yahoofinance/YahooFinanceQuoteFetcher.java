@@ -8,6 +8,8 @@ import io.github.rxue.investmentutility.vo.NumberWithFormat;
 import io.github.rxue.investmentutility.vo.Pair;
 import io.github.rxue.investmentutility.vo.QuotePrice;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.CookieManager;
@@ -48,6 +50,8 @@ public class YahooFinanceQuoteFetcher implements QuoteFetcher {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return new LinkedHashMap<>(Map.of());
+        } catch(IOException e) {
+            throw new UncheckedIOException(e);
         }
         SequencedMap<QuoteMetric,Comparable<?>> resultValues = new LinkedHashMap<>();
         for (QuoteMetric quoteMetric : quoteMetrics) {

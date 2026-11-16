@@ -1,7 +1,6 @@
-package io.github.rxue.investmentutility.v2;
+package io.github.rxue.investmentutility.v2.util;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -16,16 +15,12 @@ public final class RequestSender {
     public RequestSender(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
-    public HttpResponse<String> send(URI uri) throws InterruptedException {
+    public HttpResponse<String> send(URI uri) throws InterruptedException, IOException {
         HttpRequest request = HttpRequest.newBuilder(uri)
                 .header("User-Agent", USER_AGENT)
                 .timeout(TIMEOUT)
                 .GET()
                 .build();
-        try {
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 }
