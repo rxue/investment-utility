@@ -1,6 +1,7 @@
 package io.github.rxue.investmentutility.v2.marketquote;
 
 import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePrice;
+import io.github.rxue.investmentutility.v2.util.Result;
 
 import java.time.LocalDate;
 import java.util.List;

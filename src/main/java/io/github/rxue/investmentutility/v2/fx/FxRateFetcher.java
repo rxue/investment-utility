@@ -1,6 +1,6 @@
 package io.github.rxue.investmentutility.v2.fx;
 
-import io.github.rxue.investmentutility.v2.marketquote.Result;
+import io.github.rxue.investmentutility.v2.util.Result;
 
 import java.time.LocalDate;
 

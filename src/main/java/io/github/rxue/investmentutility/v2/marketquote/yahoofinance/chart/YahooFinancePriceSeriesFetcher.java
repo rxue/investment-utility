@@ -1,13 +1,12 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
-import io.github.rxue.investmentutility.v2.marketquote.FailureReason;
+import io.github.rxue.investmentutility.v2.util.FailureReason;
 import io.github.rxue.investmentutility.v2.marketquote.PriceSeriesFetcher;
-import io.github.rxue.investmentutility.v2.marketquote.Result;
+import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePrice;
 import io.github.rxue.investmentutility.v2.marketquote.vo.price.Value;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
