@@ -1,0 +1,44 @@
+package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.net.http.HttpClient;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class Query1V8PriceChartFetcherIT {
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+    private final Query1V8PriceChartFetcher fetcher = new Query1V8PriceChartFetcher(httpClient);
+
+    @Test
+    void fetchDaily_recentOneWeek() throws InterruptedException {
+        // the last 7 calendar days including today, from the start of the first day to the end of today in UTC
+        LocalDate today = LocalDate.now(ZoneOffset.UTC);
+        final long period1 = today.minusDays(6).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+        final long period2 = today.plusDays(1).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+
+        ChartData priceChart = fetcher.fetchDaily("PFE", period1, period2);
+
+        assertEquals("USD", priceChart.meta().currency());
+        Instant regularMarketTime = Instant.ofEpochSecond(priceChart.meta().regularMarketTime());
+        assertTrue(regularMarketTime.isAfter(Instant.now().minus(Duration.ofDays(7))),
+                "regular market time should be within the last week but was " + regularMarketTime);
+        long[] timestamps = priceChart.timestamp();
+        // 7 calendar days hold 5 trading days, fewer when they include exchange holidays
+        assertTrue(timestamps.length > 0 && timestamps.length <= 7, "there should be 1-7 timestamps but were " + timestamps.length);
+        for (long timestamp : timestamps) {
+            assertTrue(timestamp >= period1 && timestamp < period2,
+                    "timestamp " + Instant.ofEpochSecond(timestamp) + " is outside the requested period");
+        }
+        BigDecimal[] closes = priceChart.indicator().quote().close();
+        assertEquals(timestamps.length, closes.length, "price series has to correspond to timestamps");
+    }
+}

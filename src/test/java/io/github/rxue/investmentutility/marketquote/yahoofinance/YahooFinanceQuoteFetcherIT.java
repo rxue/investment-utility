@@ -1,6 +1,5 @@
 package io.github.rxue.investmentutility.marketquote.yahoofinance;
 
-import io.github.rxue.investmentutility.fx.ecb.ECBFxRateFetcher;
 import io.github.rxue.investmentutility.marketquote.QuoteMetric;
 import io.github.rxue.investmentutility.marketquote.QuoteFetcher;
 import io.github.rxue.investmentutility.vo.QuotePrice;
@@ -28,7 +27,7 @@ public class YahooFinanceQuoteFetcherIT {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-    private final QuoteFetcher searchService = new YahooFinanceQuoteFetcher(new V10QuoteSummaryFetcher(httpClient), new ECBFxRateFetcher(httpClient),"EUR");
+    private final QuoteFetcher searchService = new YahooFinanceQuoteFetcher(httpClient,"EUR");
 
     @Test
     void findMetricValues_latestMarketPriceAndDividendYield() {

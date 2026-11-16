@@ -1,6 +1,7 @@
 package io.github.rxue.investmentutility.marketquote.yahoofinance;
 
 import io.github.rxue.investmentutility.marketquote.QuoteFetchException;
+import io.github.rxue.investmentutility.v2.RequestSender;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 

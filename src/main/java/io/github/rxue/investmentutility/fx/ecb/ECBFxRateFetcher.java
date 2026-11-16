@@ -1,6 +1,7 @@
 package io.github.rxue.investmentutility.fx.ecb;
 
 import io.github.rxue.investmentutility.fx.FxRateFetcher;
+import io.github.rxue.investmentutility.v2.RequestSender;
 import io.github.rxue.investmentutility.vo.Pair;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -18,20 +19,23 @@ import java.util.Map;
 
 public class ECBFxRateFetcher implements FxRateFetcher {
     private static final String EXR_DATA_URL = "https://data-api.ecb.europa.eu/service/data/EXR/D.%s.EUR.SP00.A";
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
     // long enough to reach back over weekends and public holidays to the previous publishing day
     private static final int LOOKBACK_DAYS = 7;
 
-    private final HttpClient httpClient;
+    private final RequestSender requestSender;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ECBFxRateFetcher(HttpClient httpClient) {
-        this.httpClient = httpClient;
+        this.requestSender = new RequestSender(httpClient);
     }
     @Override
     public final Pair<LocalDate,BigDecimal> fetchRate(String baseCurrency, String quoteCurrency, LocalDate date) {
         if ("EUR".equals(baseCurrency)){
-            return fetchFxRateFromEuro(quoteCurrency, date);
+            try {
+                return fetchFxRateFromEuro(quoteCurrency, date);
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
         }
         throw new UnsupportedOperationException();
     }
@@ -40,13 +44,13 @@ public class ECBFxRateFetcher implements FxRateFetcher {
      * @return the reference rate of the given date, or of the latest publishing day before it when no rate was
      * published on that date, paired with the date the rate is actually from
      */
-    private Pair<LocalDate,BigDecimal> fetchFxRateFromEuro(String currency, LocalDate date) {
+    private Pair<LocalDate,BigDecimal> fetchFxRateFromEuro(String currency, LocalDate date) throws InterruptedException {
         if ("EUR".equals(currency)) {
             return new Pair<>(date, BigDecimal.ONE);
         }
         URI uri = URI.create(String.format(EXR_DATA_URL, currency)
                 + "?startPeriod=" + date.minusDays(LOOKBACK_DAYS) + "&endPeriod=" + date + "&format=jsondata");
-        HttpResponse<String> response = sendRequest(uri);
+        HttpResponse<String> response = requestSender.send(uri);
         // the body is empty when the currency exists but has no rate in the period
         if (response.statusCode() == 404 || response.statusCode() == 200 && response.body().isBlank()) {
             throw new IllegalStateException("No ECB exchange rate of " + currency + " found within " + LOOKBACK_DAYS + " days up to " + date);
@@ -106,19 +110,4 @@ public class ECBFxRateFetcher implements FxRateFetcher {
         throw new IllegalStateException("No TIME_PERIOD dimension found in the ECB response");
     }
 
-    private HttpResponse<String> sendRequest(URI uri) {
-        HttpRequest request = HttpRequest.newBuilder(uri)
-                .header("Accept", "application/json")
-                .timeout(TIMEOUT)
-                .GET()
-                .build();
-        try {
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while requesting " + uri, e);
-        }
-    }
 }
