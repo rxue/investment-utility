@@ -1,11 +1,10 @@
 package io.github.rxue.investmentutility.v2.marketquote;
 
-import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePrice;
+import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePriceSeries;
 import io.github.rxue.investmentutility.v2.util.Result;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public interface PriceSeriesFetcher {
-    Result<List<ClosePrice>> fetchDaily(String symbol, LocalDate fromInclusive, LocalDate toInclusive);
+    Result<ClosePriceSeries> fetchDaily(String symbol, LocalDate fromInclusive, LocalDate toInclusive);
 }

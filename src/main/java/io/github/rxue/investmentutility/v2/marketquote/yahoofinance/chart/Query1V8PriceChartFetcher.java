@@ -28,7 +28,7 @@ class Query1V8PriceChartFetcher {
         URI uri = URI.create(URL_PREFIX + URLEncoder.encode(yahooTickerSymbol, StandardCharsets.UTF_8)
                 + "?period1=" + period1 + "&period2=" + period2 + "&interval=1d");
         HttpResponse<String> response = requestSender.send(uri);
-        return chartDataConverter.toData(response.body());
+        return chartDataConverter.to(response.body());
     }
 
 

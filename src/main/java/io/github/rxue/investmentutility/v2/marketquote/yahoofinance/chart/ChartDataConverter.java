@@ -1,20 +1,20 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
-import io.github.rxue.investmentutility.v2.util.JsonNodeConverter;
+import io.github.rxue.investmentutility.v2.util.JsonContentConverter;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-class ChartDataConverter implements JsonNodeConverter<Chart> {
+class ChartDataConverter implements JsonContentConverter<Chart> {
     private final ObjectMapper objectMapper;
     public ChartDataConverter() {
         this.objectMapper = new ObjectMapper();
     }
 
     @Override
-    public Chart toData(String jsonContent) {
+    public Chart to(String jsonContent) {
         JsonNode chart = objectMapper.readTree(jsonContent).path("chart");
         JsonNode error = chart.path("error");
         if (!error.isMissingNode() && !error.isNull()) {
