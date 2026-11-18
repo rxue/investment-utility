@@ -14,7 +14,7 @@ class EcbExchangeRatesFetcher {
     private static final String EXR_DATA_URL = "https://data-api.ecb.europa.eu/service/data/EXR/D.%s.EUR.SP00.A";
     private final RequestSender requestSender;
     private final JsonContentConverter<ExchangeRates> exchangeRatesConverter;
-    public EcbExchangeRatesFetcher(HttpClient httpClient, ObjectMapper objectMapper) {
+    EcbExchangeRatesFetcher(HttpClient httpClient, ObjectMapper objectMapper) {
         this.requestSender = new RequestSender(httpClient);
         this.exchangeRatesConverter = new ExchangeRatesConverter(objectMapper);
     }

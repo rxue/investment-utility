@@ -10,6 +10,7 @@ NOTE that the `BigDecimal.divide(BigDecimal divisor)`, say without rounding mode
 - Issue 2: the executor that is never shut down, comes second. It's a real bug, but it's hidden right now: the System.exit in Main ends the JVM regardless. It only becomes a hang if that exit is removed or the fetcher is used outside the CLI
 ## JUnit 5
 ### `fail` 20261117
+### `assertInstanceOf`
 # Yahoo Finance API
 ## `https://query1.finance.yahoo.com/v8/finance/chart`
 sample data
