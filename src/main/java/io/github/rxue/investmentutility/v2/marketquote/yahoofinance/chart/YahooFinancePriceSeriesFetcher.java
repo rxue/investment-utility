@@ -3,8 +3,6 @@ package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 import io.github.rxue.investmentutility.v2.marketquote.PriceSeriesFetcher;
 import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePriceSeries;
 import io.github.rxue.investmentutility.v2.util.Result;
-import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePrice;
-import io.github.rxue.investmentutility.v2.marketquote.vo.price.Value;
 
 import java.io.IOException;
 import java.math.BigDecimal;

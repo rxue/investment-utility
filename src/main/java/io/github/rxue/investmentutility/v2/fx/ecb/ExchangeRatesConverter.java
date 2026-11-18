@@ -25,8 +25,8 @@ class ExchangeRatesConverter implements JsonContentConverter<ExchangeRates> {
                 .readerFor(new TypeReference<Map<String, BigDecimal[]>>() {})
                 .readValue(observationsNode);
         ExchangeRates.DataSet dataSet = new ExchangeRates.DataSet(observations);
+        //get date observation from structure
         JsonNode structureValuesNode = root.at("/structure/dimensions/observation/0/values");
-
         List<ExchangeRates.Structure.ObservationValue> observationValues = structureValuesNode.valueStream()
                 .map(value -> LocalDate.parse(value.path("id").asString()))
                 .map(ExchangeRates.Structure.ObservationValue::new)

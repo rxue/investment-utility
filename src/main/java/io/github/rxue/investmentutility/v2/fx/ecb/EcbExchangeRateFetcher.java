@@ -10,15 +10,25 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 
-class EcbExchangeRatesFetcher {
+class EcbExchangeRateFetcher {
     private static final String EXR_DATA_URL = "https://data-api.ecb.europa.eu/service/data/EXR/D.%s.EUR.SP00.A";
     private final RequestSender requestSender;
     private final JsonContentConverter<ExchangeRates> exchangeRatesConverter;
-    EcbExchangeRatesFetcher(HttpClient httpClient, ObjectMapper objectMapper) {
+    EcbExchangeRateFetcher(HttpClient httpClient, ObjectMapper objectMapper) {
         this.requestSender = new RequestSender(httpClient);
         this.exchangeRatesConverter = new ExchangeRatesConverter(objectMapper);
     }
 
+    /**
+     * fetch the rate from euro to the given currency
+     *
+     * @param currency
+     * @param startPeriod
+     * @param endPeriod
+     * @return
+     * @throws InterruptedException
+     * @throws IOException
+     */
     ExchangeRates fetch(String currency, LocalDate startPeriod, LocalDate endPeriod) throws InterruptedException, IOException {
         URI uri = URI.create(String.format(EXR_DATA_URL, currency)
                 + "?startPeriod=" + startPeriod + "&endPeriod=" + endPeriod + "&format=jsondata");
