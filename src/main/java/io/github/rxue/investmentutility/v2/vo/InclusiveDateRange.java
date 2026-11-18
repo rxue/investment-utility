@@ -7,7 +7,7 @@ public record InclusiveDateRange(LocalDate from, LocalDate to) {
     public InclusiveDateRange {
         Objects.requireNonNull(from);
         Objects.requireNonNull(to);
-        if (from.isAfter(to))
-            throw new IllegalArgumentException(from + " is after " + to);
+        if (!from.isBefore(to))
+            throw new IllegalArgumentException(from + " is after or the same as " + to);
     }
 }

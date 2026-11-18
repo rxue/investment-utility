@@ -21,10 +21,11 @@ class Query1V8PriceChartFetcherIT {
 
     @Test
     void fetchDaily_recentOneDay() throws InterruptedException, IOException {
-        // the last 7 calendar days including today, from the start of the first day to the end of today in UTC
-        LocalDate today = LocalDate.of(2026,1,2);
-        final long period1 = today.minusDays(2).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
-        final long period2 = today.minusDays(1).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+        // the last 7 calendar days including date, from the start of the first day to the end of date in UTC
+        LocalDate startDate = LocalDate.of(2026,11,9);
+        final long period1 = startDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+        final LocalDate endDate = startDate.plusDays(3);
+        final long period2 = endDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond();
 
         Chart.Result priceChart = fetcher.fetchDaily("PFE", period1, period2)
                 .result();

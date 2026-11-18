@@ -7,8 +7,8 @@ public interface FxRateFetcher {
     /**
      *
      * @param quoteCurrency the quote currency
-     * @param dateRange the inclusive date range
+     * @param inclusiveDateRange the inclusive date range
      * @return
      */
-    Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange dateRange);
+    Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange);
 }

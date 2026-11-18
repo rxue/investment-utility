@@ -19,9 +19,10 @@ public class EcbFxRateFetcher implements FxRateFetcher {
     }
 
     @Override
-    public Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange dateRange) {
+    public Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange) {
         try {
-            ExchangeRates exchangeRates = exchangeRateFetcher.fetch(quoteCurrency, dateRange.from(), dateRange.to());
+            LocalDate startDate = inclusiveDateRange.from();
+            ExchangeRates exchangeRates = exchangeRateFetcher.fetch(quoteCurrency, startDate.minusDays(10), inclusiveDateRange.to());
             return new Result.Success<>(toFxRateSeries(quoteCurrency, exchangeRates));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -41,4 +42,5 @@ public class EcbFxRateFetcher implements FxRateFetcher {
         }
         return new FxRateSeries(quoteCurrency, dates, values);
     }
+
 }
