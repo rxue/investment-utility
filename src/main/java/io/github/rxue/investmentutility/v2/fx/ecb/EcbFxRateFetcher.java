@@ -12,6 +12,8 @@ import java.net.http.HttpClient;
 import java.time.LocalDate;
 import java.util.Map;
 
+import static io.github.rxue.investmentutility.v2.util.Constants.BACKWARD_DAYS;
+
 public class EcbFxRateFetcher implements FxRateFetcher {
     private final EcbExchangeRateFetcher exchangeRateFetcher;
     public EcbFxRateFetcher(HttpClient httpClient, ObjectMapper objectMapper) {
@@ -22,7 +24,7 @@ public class EcbFxRateFetcher implements FxRateFetcher {
     public Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange) {
         try {
             LocalDate startDate = inclusiveDateRange.from();
-            ExchangeRates exchangeRates = exchangeRateFetcher.fetch(quoteCurrency, startDate.minusDays(10), inclusiveDateRange.to());
+            ExchangeRates exchangeRates = exchangeRateFetcher.fetch(quoteCurrency, startDate.minusDays(BACKWARD_DAYS), inclusiveDateRange.to());
             return new Result.Success<>(toFxRateSeries(quoteCurrency, exchangeRates));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

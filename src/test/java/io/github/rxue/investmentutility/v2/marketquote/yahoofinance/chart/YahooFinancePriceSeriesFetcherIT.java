@@ -1,6 +1,6 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
-import io.github.rxue.investmentutility.v2.marketquote.vo.price.ClosePriceSeries;
+import io.github.rxue.investmentutility.v2.marketquote.ClosePriceSeries;
 import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.vo.InclusiveDateRange;
 import org.junit.jupiter.api.Test;
@@ -32,8 +32,8 @@ class YahooFinancePriceSeriesFetcherIT {
         };
         assertEquals("USD", series.currency());
         // the keys are the epoch seconds of the session opens, 9:30 New York time
-        assertEquals(series.get(LocalDate.of(2026, 1, 2)), new BigDecimal("25.18"));
-        assertEquals(series.get(LocalDate.of(2026, 1, 5)), new BigDecimal("25.17"));
+        assertEquals(new BigDecimal("25.18"), series.get(LocalDate.of(2026, 1, 2)));
+        assertEquals(new BigDecimal("25.17"), series.get(LocalDate.of(2026, 1, 5)));
     }
     @Test
     void fetchDaily_start_date_is_last_easter_holiday() {
@@ -47,7 +47,9 @@ class YahooFinancePriceSeriesFetcherIT {
         };
         assertEquals("USD", series.currency());
         // the keys are the epoch seconds of the session opens, 9:30 New York time
-        assertEquals(series.get(LocalDate.of(2026, 1, 2)), new BigDecimal("25.18"));
-        assertEquals(series.get(LocalDate.of(2026, 1, 5)), new BigDecimal("25.17"));
+        assertEquals(new BigDecimal("28.32"), series.get(LocalDate.of(2026, 4, 4)));
+        assertEquals(new BigDecimal("28.32"), series.get(LocalDate.of(2026, 4, 5)));
+        assertEquals(new BigDecimal("27.83"), series.get(LocalDate.of(2026, 4, 6)));
+        assertEquals(new BigDecimal("27.10"), series.get(LocalDate.of(2026, 4, 7)));
     }
 }
