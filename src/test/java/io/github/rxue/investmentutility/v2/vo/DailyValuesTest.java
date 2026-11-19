@@ -1,6 +1,6 @@
-package io.github.rxue.investmentutility.v2.fx.ecb;
+package io.github.rxue.investmentutility.v2.vo;
 
-import io.github.rxue.investmentutility.v2.fx.FxRateSeries;
+import io.github.rxue.investmentutility.v2.util.DailyValues;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FxRateArrayTest {
+public class DailyValuesTest {
     @Test
     void get_base_without_weekend_gap() {
         // ECB EUR/USD, Monday 5.1.2026 - Friday 9.1.2026 (see EcbFxRateFetcherIT)
@@ -23,15 +23,14 @@ class FxRateArrayTest {
         BigDecimal thursdayRate = new BigDecimal("1.1675");
         BigDecimal fridayRate = new BigDecimal("1.1642");
 
-        FxRateSeries fxRateSeries = new FxRateSeries("USD",
-                new LocalDate[]{monday, tuesday, wednesday, thursday, friday},
+        DailyValues dailyValues = new DailyValues((int) monday.toEpochDay(),
                 new BigDecimal[]{mondayRate, tuesdayRate, wednesdayRate, thursdayRate, fridayRate});
 
-        assertEquals(mondayRate, fxRateSeries.get(monday));
-        assertEquals(tuesdayRate, fxRateSeries.get(tuesday));
-        assertEquals(wednesdayRate, fxRateSeries.get(wednesday));
-        assertEquals(thursdayRate, fxRateSeries.get(thursday));
-        assertEquals(fridayRate, fxRateSeries.get(friday));
+        assertEquals(mondayRate, dailyValues.get(monday));
+        assertEquals(tuesdayRate, dailyValues.get(tuesday));
+        assertEquals(wednesdayRate, dailyValues.get(wednesday));
+        assertEquals(thursdayRate, dailyValues.get(thursday));
+        assertEquals(fridayRate, dailyValues.get(friday));
     }
 
     @Test
@@ -48,16 +47,14 @@ class FxRateArrayTest {
         BigDecimal thursdayRate = new BigDecimal("1.1675");
         BigDecimal fridayRate = new BigDecimal("1.1642");
 
-        FxRateSeries fxRateSeries = new FxRateSeries("USD",
-                new LocalDate[]{monday, tuesday, wednesday, thursday, friday},
+        DailyValues dailyValues = new DailyValues((int) monday.toEpochDay(),
                 new BigDecimal[]{mondayRate, tuesdayRate, wednesdayRate, thursdayRate, fridayRate});
 
-        assertEquals(mondayRate, fxRateSeries.get(monday));
-        assertEquals(tuesdayRate, fxRateSeries.get(tuesday));
-        assertEquals(wednesdayRate, fxRateSeries.get(wednesday));
-        assertEquals(thursdayRate, fxRateSeries.get(thursday));
-        assertEquals(fridayRate, fxRateSeries.get(friday));
-        assertEquals(fridayRate, fxRateSeries.get(friday.plusDays(1)));
+        assertEquals(mondayRate, dailyValues.get(monday));
+        assertEquals(tuesdayRate, dailyValues.get(tuesday));
+        assertEquals(wednesdayRate, dailyValues.get(wednesday));
+        assertEquals(thursdayRate, dailyValues.get(thursday));
+        assertEquals(fridayRate, dailyValues.get(friday));
+        assertEquals(fridayRate, dailyValues.get(friday.plusDays(1)));
     }
-
 }

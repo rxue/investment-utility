@@ -15,9 +15,9 @@ class ClosePriceSeriesTest {
         BigDecimal priceOn20260105 = new BigDecimal("25.170000076293945");
         ClosePriceSeries series = new ClosePriceSeries("USD", new long[]{1767364200, 1767623400},
                 new BigDecimal[]{priceOn20260102, priceOn20260105});
-        assertEquals(priceOn20260102, series.priceOf(LocalDate.of(2026,1,2)));
-        assertEquals(priceOn20260102, series.priceOf(LocalDate.of(2026,1,3)));
-        assertEquals(priceOn20260102, series.priceOf(LocalDate.of(2026,1,4)));
-        assertEquals(priceOn20260105, series.priceOf(LocalDate.of(2026,1,5)));
+        assertEquals(priceOn20260102, series.get(LocalDate.of(2026,1,2)));
+        assertEquals(priceOn20260102, series.get(LocalDate.of(2026,1,3)));
+        assertEquals(priceOn20260102, series.get(LocalDate.of(2026,1,4)));
+        assertEquals(priceOn20260105, series.get(LocalDate.of(2026,1,5)));
     }
 }

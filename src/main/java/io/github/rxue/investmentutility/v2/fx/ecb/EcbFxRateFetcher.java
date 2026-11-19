@@ -40,7 +40,7 @@ public class EcbFxRateFetcher implements FxRateFetcher {
         for (int i = 0; i < series.size(); i++) {
             values[i] = series.get(i + "")[0];
         }
-        return new FxRateSeries(quoteCurrency, dates, values);
+        return new EcbFxRateSeries(quoteCurrency, dates, values);
     }
 
 }

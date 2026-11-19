@@ -11,10 +11,14 @@ import java.util.Map;
 public class ClosePriceSeries {
     private final String currency;
     private final long startTimestamp;
+    private final long[] utcTimestamps;
+    private final BigDecimal[] values;
     private final Map<Long,BigDecimal> valueMap;
     public ClosePriceSeries(String currency, long[] utcTimestamps, BigDecimal[] values) {
         this.currency = currency;
+        this.utcTimestamps = utcTimestamps;
         this.startTimestamp = utcTimestamps[0];
+        this.values = values;
         this.valueMap = toValueMap(utcTimestamps, values);
     }
     public String currency() {
@@ -34,7 +38,7 @@ public class ClosePriceSeries {
         return startOfTheDay.plusSeconds(secondsPassed).getEpochSecond();
     }
 
-    public BigDecimal priceOf(LocalDate date) {
+    public BigDecimal get(LocalDate date) {
         BigDecimal directResult = valueMap.get(utcTimestamp(date));
         if (directResult == null) {
             final LocalDate startDate = LocalDate.ofInstant(Instant.ofEpochSecond(startTimestamp), ZoneOffset.UTC);
