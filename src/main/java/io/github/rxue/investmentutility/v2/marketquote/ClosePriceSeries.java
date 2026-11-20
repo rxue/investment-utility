@@ -5,5 +5,5 @@ import java.time.LocalDate;
 
 public interface ClosePriceSeries {
     String currency();
-    BigDecimal get(LocalDate date);
+    BigDecimal price(LocalDate date);
 }

@@ -18,7 +18,7 @@ class YahooClosePriceSeries implements ClosePriceSeries {
         this.currency = currency;
         this.utcTimestamps = utcTimestamps;
         this.values = values;
-        this.dailyValues = DailyValues.generate(toLocalDates(utcTimestamps), values);
+        this.dailyValues = DailyValues.generate(toLocalDates(this.utcTimestamps), this.values);
     }
     /**
      * Each timestamp is the session open of a trading day, converted here to its UTC date.
@@ -35,7 +35,7 @@ class YahooClosePriceSeries implements ClosePriceSeries {
         return currency;
     }
     @Override
-    public BigDecimal get(LocalDate date) {
+    public BigDecimal price(LocalDate date) {
         return dailyValues.get(date);
     }
 }
