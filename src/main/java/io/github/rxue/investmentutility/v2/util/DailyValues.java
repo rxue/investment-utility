@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
-public class DailyValues{
+public final class DailyValues{
     private final int firstEpochDay;
     private final BigDecimal[] values;
 
