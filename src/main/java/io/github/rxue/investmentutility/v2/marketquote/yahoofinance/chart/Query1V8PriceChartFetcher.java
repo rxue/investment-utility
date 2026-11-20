@@ -62,7 +62,9 @@ class Query1V8PriceChartFetcher {
             }
             // closes arrive as doubles such as 342.3699951171875; priceHint is the number of decimals the price is quoted with
             int scale = meta.path("priceHint").asInt(2);
-            JsonNode closeNodes = result.path("indicators").path("quote").path(0).path("close");
+
+            JsonNode indicators = result.path("indicators");
+            JsonNode closeNodes = indicators.path("quote").path(0).path("close");
             BigDecimal[] closes = new BigDecimal[closeNodes.size()];
             for (int i = 0; i < closes.length; i++) {
                 JsonNode close = closeNodes.path(i);
@@ -71,7 +73,21 @@ class Query1V8PriceChartFetcher {
             }
             return new Chart.Result(new Chart.Meta(meta.path("currency").asString(), meta.path("regularMarketTime").asLong()),
                     timestamps,
-                    new Chart.Indicators(new Chart.Quote(closes)));
+                    new Chart.Indicators(new Chart.Quote(closes), parseAdjustedClosePrices(indicators.path("adjclose"))));
+        }
+        /**
+         * @param adjCloses the {@code indicators.adjclose} node, shaped {@code [ { "adjclose": [ ... ] } ] }
+         * @return the split- and dividend-adjusted closes at full precision, null for a day without trades so that
+         * they stay aligned with their timestamps; empty if the response has no adjusted closes
+         */
+        private static BigDecimal[] parseAdjustedClosePrices(JsonNode adjCloses) {
+            JsonNode adjCloseNodes = adjCloses.path(0).path("adjclose");
+            BigDecimal[] adjustedCloses = new BigDecimal[adjCloseNodes.size()];
+            for (int i = 0; i < adjustedCloses.length; i++) {
+                JsonNode adjClose = adjCloseNodes.path(i);
+                adjustedCloses[i] = adjClose.isNumber() ? adjClose.decimalValue() : null;
+            }
+            return adjustedCloses;
         }
     }
 }

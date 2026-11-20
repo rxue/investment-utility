@@ -14,7 +14,7 @@ record Chart(Result result, Error error) {
     record Meta(String currency, long regularMarketTime) {
     }
 
-    record Indicators(Quote quote) {
+    record Indicators(Quote quote, BigDecimal[] adjClose) {
     }
 
     record Quote(BigDecimal[] close) {
