@@ -1,10 +1,6 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
-import io.github.rxue.investmentutility.v2.marketquote.ClosePriceSeries;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

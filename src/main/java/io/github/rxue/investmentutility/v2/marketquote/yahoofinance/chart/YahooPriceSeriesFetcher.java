@@ -1,9 +1,8 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
 import io.github.rxue.investmentutility.v2.fx.FxRateFetcher;
-import io.github.rxue.investmentutility.v2.marketquote.CloseCentPriceSeries;
 import io.github.rxue.investmentutility.v2.marketquote.PriceSeriesFetcher;
-import io.github.rxue.investmentutility.v2.marketquote.ClosePriceSeries;
+import io.github.rxue.investmentutility.v2.marketquote.DailyPriceSeries;
 import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.vo.InclusiveDateRange;
 
@@ -41,27 +40,27 @@ public class YahooPriceSeriesFetcher implements PriceSeriesFetcher {
     }
 
     @Override
-    public Result<ClosePriceSeries<Double>> fetchDailyAdjusted(String tickerSymbol, InclusiveDateRange inclusiveDateRange) {
-        Function<Chart.Result,ClosePriceSeries<Double>> adjustedClosePricesParser = result -> {
+    public Result<DailyPriceSeries<Double>> fetchAdjustedClosePrices(String tickerSymbol, InclusiveDateRange inclusiveDateRange) {
+        Function<Chart.Result, DailyPriceSeries<Double>> adjustedClosePricesParser = result -> {
             long[] timestamps = result.timestamp();
             Double[] adjustedCloses = Arrays.stream(result.indicator().adjClose())
                     .boxed()
                     .toArray(Double[]::new);
-            return new YahooClosePriceSeries<>(result.meta().currency(), timestamps, adjustedCloses);
+            return new YahooDailyPriceSeries<>(result.meta().currency(), timestamps, adjustedCloses, inclusiveDateRange.to());
         };
         return fetchDaily(tickerSymbol, inclusiveDateRange, adjustedClosePricesParser);
     }
 
     @Override
-    public Result<CloseCentPriceSeries> fetchDaily(String tickerSymbol, InclusiveDateRange inclusiveDateRange) {
-        Function<Chart.Result,CloseCentPriceSeries> closePricesParser = result -> {
+    public Result<DailyPriceSeries<Long>> fetchClosePrices(String tickerSymbol, InclusiveDateRange inclusiveDateRange) {
+        Function<Chart.Result,DailyPriceSeries<Long>> closePricesParser = result -> {
             long[] timestamps = result.timestamp();
             BigDecimal[] closes = result.indicator().quote().close();
             // a day without trades has a null close, kept as null so that it stays aligned with its timestamp
             Long[] closesInCent = Arrays.stream(closes)
                     .map(close -> close.movePointRight(2).setScale(0, RoundingMode.HALF_UP).longValueExact())
                     .toArray(Long[]::new);
-            return new YahooClosePriceInCentSeries(result.meta().currency(), timestamps, closesInCent);
+            return new YahooDailyPriceSeries(result.meta().currency(), timestamps, closesInCent, inclusiveDateRange.to());
         };
         return fetchDaily(tickerSymbol, inclusiveDateRange, closePricesParser);
     }

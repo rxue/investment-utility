@@ -50,8 +50,8 @@ class EcbExchangeRateFetcher {
         public ExchangeRates to(String jsonContent) {
             final JsonNode root = objectMapper.readTree(jsonContent);
             JsonNode observationsNode = root.at("/dataSets/0/series/0:0:0:0:0/observations");
-            Map<String, BigDecimal[]> observations = objectMapper
-                    .readerFor(new TypeReference<Map<String, BigDecimal[]>>() {})
+            Map<String, Double[]> observations = objectMapper
+                    .readerFor(new TypeReference<Map<String, Double[]>>() {})
                     .readValue(observationsNode);
             ExchangeRates.DataSet dataSet = new ExchangeRates.DataSet(observations);
             //get date observation from structure

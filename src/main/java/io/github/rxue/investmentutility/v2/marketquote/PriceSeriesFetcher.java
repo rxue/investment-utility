@@ -10,6 +10,6 @@ public interface PriceSeriesFetcher {
      * @param inclusiveDateRange
      * @return
      */
-    Result<ClosePriceSeries<Double>> fetchDailyAdjusted(String tickerSymbol, InclusiveDateRange inclusiveDateRange);
-    Result<CloseCentPriceSeries> fetchDaily(String tickerSymbol, InclusiveDateRange inclusiveDateRange);
+    Result<DailyPriceSeries<Double>> fetchAdjustedClosePrices(String tickerSymbol, InclusiveDateRange inclusiveDateRange);
+    Result<DailyPriceSeries<Long>> fetchClosePrices(String tickerSymbol, InclusiveDateRange inclusiveDateRange);
 }

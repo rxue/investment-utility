@@ -1,5 +1,6 @@
 package io.github.rxue.investmentutility.v2.fx;
 
+import io.github.rxue.investmentutility.v2.util.DailyValues;
 import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.vo.InclusiveDateRange;
 
@@ -10,5 +11,5 @@ public interface FxRateFetcher {
      * @param inclusiveDateRange the inclusive date range
      * @return
      */
-    Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange);
+    Result<DailyValues<Double>> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange);
 }

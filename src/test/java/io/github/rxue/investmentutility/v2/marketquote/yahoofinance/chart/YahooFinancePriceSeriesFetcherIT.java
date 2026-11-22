@@ -1,8 +1,7 @@
 package io.github.rxue.investmentutility.v2.marketquote.yahoofinance.chart;
 
 import io.github.rxue.investmentutility.v2.fx.ecb.EcbFxRateFetcher;
-import io.github.rxue.investmentutility.v2.marketquote.CloseCentPriceSeries;
-import io.github.rxue.investmentutility.v2.marketquote.ClosePriceSeries;
+import io.github.rxue.investmentutility.v2.marketquote.DailyPriceSeries;
 import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.vo.InclusiveDateRange;
 import org.junit.jupiter.api.Test;
@@ -27,65 +26,65 @@ class YahooFinancePriceSeriesFetcherIT {
                     new EcbFxRateFetcher(httpClient, objectMapper));
 
     @Test
-    void fetchDaily_2_trading_days() {
+    void fetchClosePrices_2_trading_days() {
         // Friday 2.1.2026 and Monday 5.1.2026, the weekend in between has no close
         InclusiveDateRange dateRange = new InclusiveDateRange(LocalDate.of(2026, 1, 2), LocalDate.of(2026, 1, 5));
-        Result<CloseCentPriceSeries> result = fetcher.fetchDaily("PFE", dateRange);
+        Result<DailyPriceSeries<Long>> result = fetcher.fetchClosePrices("PFE", dateRange);
 
-        CloseCentPriceSeries series = switch (result) {
-            case Result.Success<CloseCentPriceSeries>(CloseCentPriceSeries value) -> value;
+        DailyPriceSeries<Long> series = switch (result) {
+            case Result.Success<DailyPriceSeries<Long>>(DailyPriceSeries<Long> value) -> value;
             default -> fail("expected a success but got " + result);
         };
         assertEquals("USD", series.currency());
-        // the keys are the epoch seconds of the session opens, 9:30 New York time
-        assertEquals(2518L, series.priceInCent(LocalDate.of(2026, 1, 2)));
-        assertEquals(2517L, series.priceInCent(LocalDate.of(2026, 1, 5)));
+        // the keys are the epoch seconds of the session opens, 9:30 New York time; prices in cents
+        assertEquals(2518L, series.value(LocalDate.of(2026, 1, 2)));
+        assertEquals(2517L, series.value(LocalDate.of(2026, 1, 5)));
     }
     @Test
-    void fetchDaily_start_date_is_last_easter_holiday() {
+    void fetchClosePrices_start_date_is_last_easter_holiday() {
         // Saturday 4.4.2026 and Sunday 5.4.2026 fall back to Thursday 2.4.2026, Good Friday 3.4.2026 has no session
         InclusiveDateRange dateRange = new InclusiveDateRange(LocalDate.of(2026, 4, 4), LocalDate.of(2026, 4, 7));
-        Result<CloseCentPriceSeries> result = fetcher.fetchDaily("PFE", dateRange);
+        Result<DailyPriceSeries<Long>> result = fetcher.fetchClosePrices("PFE", dateRange);
 
-        CloseCentPriceSeries series = switch (result) {
-            case Result.Success<CloseCentPriceSeries>(CloseCentPriceSeries value) -> value;
+        DailyPriceSeries<Long> series = switch (result) {
+            case Result.Success<DailyPriceSeries<Long>>(DailyPriceSeries<Long> value) -> value;
             default -> fail("expected a success but got " + result);
         };
         assertEquals("USD", series.currency());
-        // the keys are the epoch seconds of the session opens, 9:30 New York time
-        assertEquals(2832L, series.priceInCent(LocalDate.of(2026, 4, 4)));
-        assertEquals(2832L, series.priceInCent(LocalDate.of(2026, 4, 5)));
-        assertEquals(2783L, series.priceInCent(LocalDate.of(2026, 4, 6)));
-        assertEquals(2710L, series.priceInCent(LocalDate.of(2026, 4, 7)));
+        // the keys are the epoch seconds of the session opens, 9:30 New York time; prices in cents
+        assertEquals(2832L, series.value(LocalDate.of(2026, 4, 4)));
+        assertEquals(2832L, series.value(LocalDate.of(2026, 4, 5)));
+        assertEquals(2783L, series.value(LocalDate.of(2026, 4, 6)));
+        assertEquals(2710L, series.value(LocalDate.of(2026, 4, 7)));
     }
     @Test
-    void fetchDailyAdjusted_2_trading_days() {
+    void fetchClosePricesAdjusted_2_trading_days() {
         // Friday 2.1.2026 and Monday 5.1.2026, the weekend in between has no close
         InclusiveDateRange dateRange = new InclusiveDateRange(LocalDate.of(2026, 1, 2), LocalDate.of(2026, 1, 5));
-        Result<ClosePriceSeries<Double>> result = fetcher.fetchDailyAdjusted("PFE", dateRange);
+        Result<DailyPriceSeries<Double>> result = fetcher.fetchAdjustedClosePrices("PFE", dateRange);
 
-        ClosePriceSeries<Double> series = switch (result) {
-            case Result.Success<ClosePriceSeries<Double>>(ClosePriceSeries<Double> value) -> value;
+        DailyPriceSeries<Double> series = switch (result) {
+            case Result.Success<DailyPriceSeries<Double>>(DailyPriceSeries<Double> value) -> value;
             default -> fail("expected a success but got " + result);
         };
         assertEquals("USD", series.currency());
-        assertEquals(23.59955, series.price(LocalDate.of(2026, 1, 2)), DELTA);
-        assertEquals(23.59017, series.price(LocalDate.of(2026, 1, 5)), DELTA);
+        assertEquals(23.59955, series.value(LocalDate.of(2026, 1, 2)), DELTA);
+        assertEquals(23.59017, series.value(LocalDate.of(2026, 1, 5)), DELTA);
     }
     @Test
-    void fetchDailyAdjusted_start_date_is_last_easter_holiday() {
+    void fetchClosePricesAdjusted_start_date_is_last_easter_holiday() {
         // Saturday 4.4.2026 and Sunday 5.4.2026 fall back to Thursday 2.4.2026, Good Friday 3.4.2026 has no session
         InclusiveDateRange dateRange = new InclusiveDateRange(LocalDate.of(2026, 4, 4), LocalDate.of(2026, 4, 7));
-        Result<ClosePriceSeries<Double>> result = fetcher.fetchDailyAdjusted("PFE", dateRange);
+        Result<DailyPriceSeries<Double>> result = fetcher.fetchAdjustedClosePrices("PFE", dateRange);
 
-        ClosePriceSeries<Double> series = switch (result) {
-            case Result.Success<ClosePriceSeries<Double>>(ClosePriceSeries<Double> value) -> value;
+        DailyPriceSeries<Double> series = switch (result) {
+            case Result.Success<DailyPriceSeries<Double>>(DailyPriceSeries<Double> value) -> value;
             default -> fail("expected a success but got " + result);
         };
         assertEquals("USD", series.currency());
-        assertEquals(26.98707, series.price(LocalDate.of(2026, 4, 4)), DELTA);
-        assertEquals(26.98707, series.price(LocalDate.of(2026, 4, 5)), DELTA);
-        assertEquals(26.52014, series.price(LocalDate.of(2026, 4, 6)), DELTA);
-        assertEquals(25.82450, series.price(LocalDate.of(2026, 4, 7)), DELTA);
+        assertEquals(26.98707, series.value(LocalDate.of(2026, 4, 4)), DELTA);
+        assertEquals(26.98707, series.value(LocalDate.of(2026, 4, 5)), DELTA);
+        assertEquals(26.52014, series.value(LocalDate.of(2026, 4, 6)), DELTA);
+        assertEquals(25.82450, series.value(LocalDate.of(2026, 4, 7)), DELTA);
     }
 }

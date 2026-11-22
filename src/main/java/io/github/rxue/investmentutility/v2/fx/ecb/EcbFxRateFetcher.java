@@ -1,13 +1,12 @@
 package io.github.rxue.investmentutility.v2.fx.ecb;
 
 import io.github.rxue.investmentutility.v2.fx.FxRateFetcher;
-import io.github.rxue.investmentutility.v2.fx.FxRateSeries;
+import io.github.rxue.investmentutility.v2.util.DailyValues;
 import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.vo.InclusiveDateRange;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.http.HttpClient;
 import java.time.LocalDate;
 import java.util.Map;
@@ -21,11 +20,11 @@ public class EcbFxRateFetcher implements FxRateFetcher {
     }
 
     @Override
-    public Result<FxRateSeries> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange) {
+    public Result<DailyValues<Double>> fetchRateFromEuroTo(String quoteCurrency, InclusiveDateRange inclusiveDateRange) {
         try {
             LocalDate startDate = inclusiveDateRange.from();
             ExchangeRates exchangeRates = exchangeRateFetcher.fetch(quoteCurrency, startDate.minusDays(BACKWARD_DAYS), inclusiveDateRange.to());
-            return new Result.Success<>(toFxRateSeries(quoteCurrency, exchangeRates));
+            return new Result.Success<>(toValueSeries(exchangeRates, inclusiveDateRange.to()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return new Result.TechnicalError<>("Task canceled", e);
@@ -33,16 +32,16 @@ public class EcbFxRateFetcher implements FxRateFetcher {
             return new Result.TechnicalError<>("Network connection error", e);
         }
     }
-    private static FxRateSeries toFxRateSeries(String quoteCurrency, ExchangeRates exchangeRates) {
+    private DailyValues<Double> toValueSeries(ExchangeRates exchangeRates, LocalDate inclusiveEndDate) {
         LocalDate[] dates = exchangeRates.structure().observationValues().stream()
                 .map(ExchangeRates.Structure.ObservationValue::id)
                 .toArray(LocalDate[]::new);
-        Map<String,BigDecimal[]> series = exchangeRates.dataSet().seriesObservations();
-        BigDecimal[] values = new BigDecimal[series.size()];
+        Map<String,Double[]> series = exchangeRates.dataSet().seriesObservations();
+        Double[] values = new Double[series.size()];
         for (int i = 0; i < series.size(); i++) {
             values[i] = series.get(i + "")[0];
         }
-        return new EcbFxRateSeries(quoteCurrency, dates, values);
+        return DailyValues.of(dates, values, inclusiveEndDate, LocalDate::toEpochDay);
     }
 
 }
