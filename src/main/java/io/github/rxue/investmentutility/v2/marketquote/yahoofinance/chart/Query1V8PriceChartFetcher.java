@@ -80,12 +80,12 @@ class Query1V8PriceChartFetcher {
          * @return the split- and dividend-adjusted closes at full precision, null for a day without trades so that
          * they stay aligned with their timestamps; empty if the response has no adjusted closes
          */
-        private static BigDecimal[] parseAdjustedClosePrices(JsonNode adjCloses) {
+        private static double[] parseAdjustedClosePrices(JsonNode adjCloses) {
             JsonNode adjCloseNodes = adjCloses.path(0).path("adjclose");
-            BigDecimal[] adjustedCloses = new BigDecimal[adjCloseNodes.size()];
+            double[] adjustedCloses = new double[adjCloseNodes.size()];
             for (int i = 0; i < adjustedCloses.length; i++) {
                 JsonNode adjClose = adjCloseNodes.path(i);
-                adjustedCloses[i] = adjClose.isNumber() ? adjClose.decimalValue() : null;
+                adjustedCloses[i] = adjClose.isNumber() ? adjClose.doubleValue() : null;
             }
             return adjustedCloses;
         }

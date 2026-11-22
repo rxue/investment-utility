@@ -1,40 +1,36 @@
 package io.github.rxue.investmentutility.v2.util;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.function.Function;
 
-public final class DailyValues{
-    private final int firstEpochDay;
-    private final BigDecimal[] values;
-
-    public DailyValues(int firstEpochDay, BigDecimal[] values) {
-        this.firstEpochDay = firstEpochDay;
-        this.values = Arrays.copyOf(values, values.length);
+public final class DailyValues<T,V> {
+    private final T[] timestamps;
+    private final V[] values;
+    private final Function<T,Long> toEpochDay;
+    private final LocalDate inclusiveEndDate;
+    private final long firstEpochDay;
+    public DailyValues(T[] timestamps, V[] values, LocalDate inclusiveEndDate, Function<T,Long> toEpochDay) {
+        this.timestamps = timestamps;
+        this.values = values;
+        this.toEpochDay = toEpochDay;
+        this.inclusiveEndDate = inclusiveEndDate;
+        this.firstEpochDay = toEpochDay.apply(timestamps[0]);
     }
-
-    public BigDecimal get(LocalDate date) {
-        int index = (int)date.toEpochDay() - firstEpochDay;
-        if (index >= values.length) {
-            return values[values.length-1];
+    public V value(LocalDate date) {
+        if (date.isAfter(inclusiveEndDate))
+            throw new IllegalArgumentException("Given date " + date + " is after the inclusive end date " + inclusiveEndDate);
+        final long epochDay = date.toEpochDay();
+        for (int i = (int)(epochDay - firstEpochDay); i >= 0; i--) {
+            if (i < timestamps.length) {
+                long currentEpochDay = toEpochDay.apply(timestamps[i]);
+                if (epochDay < currentEpochDay && epochDay >= toEpochDay.apply(timestamps[i-1]))
+                    return values[i-1];
+                else if (epochDay == currentEpochDay)
+                    return values[i];
+            } else {
+                return values[values.length-1];
+            }
         }
-        return values[(int)date.toEpochDay() - firstEpochDay];
-    }
-    public static DailyValues generate(LocalDate[] dates, BigDecimal[] values) {
-        long firstEpochDay = dates[0].toEpochDay();
-        final int amountOfDays = (int) ChronoUnit.DAYS.between(dates[0], dates[dates.length-1].plusDays(1));
-        BigDecimal[] dailyValues = new BigDecimal[amountOfDays];
-        for (int i = 0; i < dates.length-1; i++) {
-            fill(values[i], firstEpochDay, dates[i], dates[i+1], dailyValues);
-        }
-        dailyValues[dailyValues.length-1] = values[values.length-1];
-        return new DailyValues((int) firstEpochDay, dailyValues);
-    }
-    private static void fill(BigDecimal fxRate, final long firstEpochDay, LocalDate date, LocalDate nextDate, BigDecimal[] valuesToFill) {
-        for (int i = (int)(date.toEpochDay() - firstEpochDay);
-             i < (int)(nextDate.toEpochDay() - firstEpochDay); i++) {
-            valuesToFill[i] = fxRate;
-        }
+        throw new IllegalStateException();
     }
 }

@@ -1,7 +1,7 @@
 package io.github.rxue.investmentutility.v2.fx.ecb;
 
 import io.github.rxue.investmentutility.v2.fx.FxRateSeries;
-import io.github.rxue.investmentutility.v2.util.DailyValues;
+import io.github.rxue.investmentutility.v2.util.LegacyDailyValues;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,12 +11,12 @@ class EcbFxRateSeries implements FxRateSeries {
     private final String quoteCurrency;
     private final LocalDate[] dates;
     private final BigDecimal[] values;
-    private final DailyValues dailyValues;
+    private final LegacyDailyValues dailyValues;
     public EcbFxRateSeries(String quoteCurrency, LocalDate[] dates, BigDecimal[] values) {
         this.quoteCurrency = quoteCurrency;
         this.dates = Arrays.copyOf(dates, dates.length);
         this.values = Arrays.copyOf(values, values.length);
-        this.dailyValues = DailyValues.generate(dates, values);
+        this.dailyValues = LegacyDailyValues.generate(dates, values);
     }
     @Override
     public String quoteCurrency() {
