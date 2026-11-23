@@ -11,11 +11,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.function.Function;
-
-import static io.github.rxue.investmentutility.v2.util.Constants.BACKWARD_DAYS;
 
 public class YahooPriceSeriesFetcher implements PriceSeriesFetcher {
     private final Query1V8PriceChartFetcher chartFetcher;
