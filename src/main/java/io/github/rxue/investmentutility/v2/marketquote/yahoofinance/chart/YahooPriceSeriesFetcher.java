@@ -5,10 +5,12 @@ import io.github.rxue.investmentutility.v2.marketquote.PriceSeriesFetcher;
 import io.github.rxue.investmentutility.v2.marketquote.DailyPriceSeries;
 import io.github.rxue.investmentutility.v2.util.Result;
 import io.github.rxue.investmentutility.v2.vo.InclusiveDateRange;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.http.HttpClient;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -16,11 +18,13 @@ import java.util.function.Function;
 
 public class YahooPriceSeriesFetcher implements PriceSeriesFetcher {
     private final Query1V8PriceChartFetcher chartFetcher;
-    private final FxRateFetcher fxRateFetcher;
-    public YahooPriceSeriesFetcher(Query1V8PriceChartFetcher chartFetcher, FxRateFetcher fxRateFetcher) {
+    YahooPriceSeriesFetcher(Query1V8PriceChartFetcher chartFetcher) {
         this.chartFetcher = chartFetcher;
-        this.fxRateFetcher = fxRateFetcher;
     }
+    public YahooPriceSeriesFetcher(HttpClient httpClient, ObjectMapper objectMapper) {
+        this(new Query1V8PriceChartFetcher(httpClient, objectMapper));
+    }
+
 
     private <T> Result<T> fetchDaily(String tickerSymbol, InclusiveDateRange inclusiveDateRange, Function<Chart.Result,T> pricesParser) {
         final Instant start = inclusiveDateRange.from().atStartOfDay(ZoneOffset.UTC).toInstant();

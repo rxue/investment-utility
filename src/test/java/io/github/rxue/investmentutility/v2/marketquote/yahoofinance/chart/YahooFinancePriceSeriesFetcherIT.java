@@ -24,8 +24,7 @@ class YahooFinancePriceSeriesFetcherIT {
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final YahooPriceSeriesFetcher fetcher =
-            new YahooPriceSeriesFetcher(new Query1V8PriceChartFetcher(httpClient, objectMapper),
-                    new EcbFxRateFetcher(httpClient, objectMapper));
+            new YahooPriceSeriesFetcher(new Query1V8PriceChartFetcher(httpClient, objectMapper));
 
     @Test
     void fetchClosePrices_InCent_2_trading_days() {
