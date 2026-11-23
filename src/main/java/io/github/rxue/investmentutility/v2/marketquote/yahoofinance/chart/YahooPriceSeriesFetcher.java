@@ -29,7 +29,7 @@ public class YahooPriceSeriesFetcher implements PriceSeriesFetcher {
         final Instant start = inclusiveDateRange.from().atStartOfDay(ZoneOffset.UTC).toInstant();
         final Instant end = inclusiveDateRange.to().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         try {
-            Chart chartData = chartFetcher.fetchDaily(tickerSymbol, start.minus(BACKWARD_DAYS, ChronoUnit.DAYS).getEpochSecond(), end.getEpochSecond());
+            Chart chartData = chartFetcher.fetchDaily(tickerSymbol, start.getEpochSecond(), end.getEpochSecond());
             return new Result.Success<>(pricesParser.apply(chartData.result()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -46,13 +46,13 @@ public class YahooPriceSeriesFetcher implements PriceSeriesFetcher {
             Double[] adjustedCloses = Arrays.stream(result.indicator().adjClose())
                     .boxed()
                     .toArray(Double[]::new);
-            return new YahooDailyPriceSeries<>(result.meta().currency(), timestamps, adjustedCloses, inclusiveDateRange.to());
+            return new YahooDailyPriceSeries<>(result.meta().currency(), timestamps, adjustedCloses);
         };
         return fetchDaily(tickerSymbol, inclusiveDateRange, adjustedClosePricesParser);
     }
 
     @Override
-    public Result<DailyPriceSeries<Long>> fetchClosePrices(String tickerSymbol, InclusiveDateRange inclusiveDateRange) {
+    public Result<DailyPriceSeries<Long>> fetchClosePricesInCent(String tickerSymbol, InclusiveDateRange inclusiveDateRange) {
         Function<Chart.Result,DailyPriceSeries<Long>> closePricesParser = result -> {
             long[] timestamps = result.timestamp();
             BigDecimal[] closes = result.indicator().quote().close();
@@ -60,7 +60,7 @@ public class YahooPriceSeriesFetcher implements PriceSeriesFetcher {
             Long[] closesInCent = Arrays.stream(closes)
                     .map(close -> close.movePointRight(2).setScale(0, RoundingMode.HALF_UP).longValueExact())
                     .toArray(Long[]::new);
-            return new YahooDailyPriceSeries(result.meta().currency(), timestamps, closesInCent, inclusiveDateRange.to());
+            return new YahooDailyPriceSeries(result.meta().currency(), timestamps, closesInCent);
         };
         return fetchDaily(tickerSymbol, inclusiveDateRange, closePricesParser);
     }

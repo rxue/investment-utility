@@ -1,7 +1,10 @@
 package io.github.rxue.investmentutility.v2.marketquote;
 
-import io.github.rxue.investmentutility.v2.util.DailyValues;
+import io.github.rxue.investmentutility.v2.util.DailyValue;
 
-public interface DailyPriceSeries<V> extends DailyValues<V> {
+import java.util.List;
+
+public interface DailyPriceSeries<V> {
     String currency();
+    List<DailyValue<V>> dailyValues();
 }
